@@ -61,7 +61,7 @@ python train.py                                      \
 --min_len 5                                          \
 ```
 
-MASS is also compatible with MLM in XLM, and we can combine them together for pre-training. According to our experiments, loading an encoder pre-trained with MLM will further improve the performance of MASS, but loading a decoder pre-trained with MLM will decrease the performance (it will cause source-to-target copy). Therefore, we also provide a MASS pre-training script by loading an MLM pre-trained encoder.
+MASS is also compatible with MLM in XLM, and we can combine them together for pre-training. According to our experiments, loading an encoder pre-trained with MLM will further improve the performance of MASS. Therefore, we also provide a MASS pre-training script by loading an MLM pre-trained encoder.
 
 ```
 MODEL=mlm_enfr_1024.pth
