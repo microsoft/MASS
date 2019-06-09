@@ -129,9 +129,11 @@ python train.py \
 
 If you find MASS useful in your work, you can cite the paper as below:
 
-    @inproceedings{ICML2019MASS,
-        Author    = {Kaitao Song, Xu Tan, Tao Qin, Jian-Feng Lu and Tie-Yan Liu},
-        Title     = {MASS: Masked Sequence to Sequence Pre-training for Language Generation},
-        Booktitle = {International Conference on Machine Learning (ICML))},
-        Year      = {2019}
+    @inproceedings{song2019mass,
+        title={MASS: Masked Sequence to Sequence Pre-training for Language Generation},
+        author={Song, Kaitao and Tan, Xu and Qin, Tao and Lu, Jianfeng and Liu, Tie-Yan},
+        booktitle={International Conference on Machine Learning},
+        pages={5926--5936},
+        year={2019}
     }
+
