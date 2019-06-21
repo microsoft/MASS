@@ -284,7 +284,7 @@ def main(params):
                 trainer.clm_step(lang1, lang2, params.lambda_clm)
 
             # MLM steps (also includes TLM if lang2 is not None)
-            for lang2, lang2 in shuf_order(params.mlm_steps, params):
+            for lang1, lang2 in shuf_order(params.mlm_steps, params):
                 trainer.mlm_step(lang1, lang2, params.lambda_mlm)
 
             # parallel classification steps
