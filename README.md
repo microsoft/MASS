@@ -29,7 +29,7 @@ We also provide pre-trained and fine-tuned models:
 
 | Languages | Pre-trained Model | Fine-tuned Model | BPE codes | Vocabulary |
 |-----------|:-----------------:|:----------------:| ---------:| ----------:|
-| EN-FR     |   release soon    |   release soon   | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_enfr) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enfr) |   
+| EN-FR     |   [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_enfr_1024.pth?sv=2018-03-28&ss=bqtf&srt=sco&sp=rwdlacup&se=2019-06-21T11:27:32Z&sig=h%2BT7Cq7rz5JUZG%2FEVENyWLfLRQaQitCZsKsiZvnHUIg%3D&_=1561087684702)    |   [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_ft_enfr_1024.pth?sv=2018-03-28&ss=bqtf&srt=sco&sp=rwdlacup&se=2019-06-21T11:27:32Z&sig=h%2BT7Cq7rz5JUZG%2FEVENyWLfLRQaQitCZsKsiZvnHUIg%3D&_=1561087719444)   | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_enfr) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enfr) |   
 
 We are also preparing larger models on more language pairs, and will release them in the future.
 
