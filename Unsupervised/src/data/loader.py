@@ -137,7 +137,7 @@ def load_mono_data(params, data):
                 data['mono_stream'][lang][splt].select_data(a, b)
 
             # for denoising auto-encoding and online back-translation, we need a non-stream (batched) dataset
-            if lang in params.ae_steps or lang in params.bt_src_langs:
+            if lang in params.ae_steps or lang in params.bt_src_langs or lang in params.mass_steps:
 
                 # create batched dataset
                 dataset = Dataset(mono_data['sentences'], mono_data['positions'], params)
@@ -319,6 +319,11 @@ def check_data_params(params):
     
     # mass steps
     params.mass_steps = [s for s in params.mass_steps.split(',') if len(s) > 0]
+    mass_steps = []
+    for src in params.mass_steps:
+        for tgt in params.mass_steps:
+            if src != tgt:
+                mass_steps.append(tuple([src, tgt]))
 
     # back-translation steps
     params.bt_steps = [tuple(s.split('-')) for s in params.bt_steps.split(',') if len(s) > 0]
@@ -341,7 +346,7 @@ def check_data_params(params):
 
     # check parallel datasets
     required_para_train = set(params.clm_steps + params.mlm_steps + params.pc_steps + params.mt_steps)
-    required_para = required_para_train | set([(l2, l3) for _, l2, l3 in params.bt_steps])
+    required_para = required_para_train | set([(l2, l3) for _, l2, l3 in params.bt_steps] + mass_steps)
     params.para_dataset = {
         (src, tgt): {
             splt: (os.path.join(params.data_path, '%s.%s-%s.%s.pth' % (splt, src, tgt, src)),
@@ -362,7 +367,7 @@ def check_data_params(params):
     }
 
     # check that we can evaluate on BLEU
-    assert params.eval_bleu is False or len(params.mt_steps + params.bt_steps) > 0
+    assert params.eval_bleu is False or len(params.mt_steps + params.bt_steps + mass_steps) > 0
     
   
 def load_data(params):

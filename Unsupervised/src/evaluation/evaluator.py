@@ -174,9 +174,15 @@ class Evaluator(object):
                 # prediction task (evaluate perplexity and accuracy)
                 for lang1, lang2 in params.mlm_steps:
                     self.evaluate_mlm(scores, data_set, lang1, lang2)
-
+                
+                
+                mass_steps = []
+                for lang1 in params.mass_steps:
+                    for lang2 in params.mass_steps:
+                        if lang1 != lang2:
+                            mass_steps.append((lang1, lang2))
                 # machine translation task (evaluate perplexity and accuracy)
-                for lang1, lang2 in set(params.mt_steps + [(l2, l3) for _, l2, l3 in params.bt_steps]):
+                for lang1, lang2 in set(params.mt_steps + [(l2, l3) for _, l2, l3 in params.bt_steps] + mass_steps):
                     eval_bleu = params.eval_bleu and params.is_master
                     self.evaluate_mt(scores, data_set, lang1, lang2, eval_bleu)
 

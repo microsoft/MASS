@@ -1,8 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-
-
-
+#
 # Translate sentences from the input stream.
 # The model will be faster is sentences are sorted by length.
 # Input sentences must have the same tokenization and BPE codes than the ones used in the model.

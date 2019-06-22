@@ -24,9 +24,7 @@ python train.py                                      \
 --exp_name unsupMT_enfr                              \
 --data_path ./data/processed/en-fr/                  \
 --lgs 'en-fr'                                        \
---bt_steps 'en-fr-en,fr-en-fr'                       \
 --mass_steps 'en,fr'                                 \
---lambda_bt '0:0,100000:0'                           \
 --encoder_only false                                 \
 --emb_dim 1024                                       \
 --n_layers 6                                         \
@@ -53,9 +51,7 @@ python train.py                                      \
 --exp_name unsupMT_enfr                              \
 --data_path ./data/processed/en-fr/                  \
 --lgs 'en-fr'                                        \
---bt_steps 'en-fr-en,fr-en-fr'                       \
 --mass_steps 'en,fr'                                 \
---lambda_bt '0:0,100000:0'                           \
 --encoder_only false                                 \
 --emb_dim 1024                                       \
 --n_layers 6                                         \
