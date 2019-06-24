@@ -40,7 +40,7 @@ We are also preparing larger models on more language pairs, and will release the
 We use the same BPE codes and vocabulary with XLM. Here we take English-French as an example.
 
 ```
-cd Unsupervised
+cd MASS
 
 wget https://dl.fbaipublicfiles.com/XLM/codes_enfr
 wget https://dl.fbaipublicfiles.com/XLM/vocab_enfr
