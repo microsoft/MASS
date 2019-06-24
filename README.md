@@ -107,6 +107,65 @@ python train.py \
   --eval_bleu true                                     \
   --reload_model "$MODEL,$MODEL"                       \
 ```
+
+## [Text Summarization]()
+To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
+
+For pre-training, we use the following command:
+### Pre-training:
+```
+python train.py                                      \
+--exp_name mass_english                              \
+--data_path ./data/processed/en/                     \
+--lgs 'en'                                           \
+--mass_steps 'en'                                    \
+--encoder_only false                                 \
+--emb_dim 1024                                       \
+--n_layers 6                                         \
+--n_heads 8                                          \
+--dropout 0.1                                        \
+--attention_dropout 0.1                              \
+--gelu_activation true                               \
+--tokens_per_batch 3000                              \
+--optimizer adam_inverse_sqrt,beta1=0.9,beta2=0.98,lr=0.0001 \
+--epoch_size 200000                                  \
+--max_epoch 100                                      \
+--eval_bleu true                                     \
+--word_mass 0.5                                      \
+--min_len 5                                          \
+--english_only true
+```
+
+### Fine-tuning Stage
+Different from unsupervised NMT tasks, we directly use paired data (article-title) to fine-tune the pre-trained model. The fine-tuning command is:
+
+### Fine-tuning:
+```
+MODEL=mass_en_1024.pth 
+
+python train.py                                      \
+--exp_name mass_summarization                        \
+--data_path ./data/processed/summarization/          \
+--lgs 'ar-ti'                                        \
+--mt_steps 'ar-ti'                                   \
+--encoder_only false                                 \
+--emb_dim 1024                                       \
+--n_layers 6                                         \
+--n_heads 8                                          \
+--dropout 0.2                                        \
+--attention_dropout 0.2                              \
+--gelu_activation true                               \
+--tokens_per_batch 3000                              \
+--optimizer adam_inverse_sqrt,beta1=0.9,beta2=0.98,lr=0.0001 \
+--epoch_size 200000                                  \
+--max_epoch 20                                       \
+--eval_bleu true                                     \
+--word_mass 0.5                                      \
+--min_len 5                                          \
+--english_only true                                  \
+--reload_model "$MODEL,$MODEL"
+```
+
 ## Reference
 
 If you find MASS useful in your work, you can cite the paper as below:
