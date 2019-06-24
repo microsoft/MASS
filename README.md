@@ -111,6 +111,11 @@ python train.py \
 ## Text Summarization
 To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
 
+
+| Pre-trained Model | BPE codes | Vocabulary |
+|:-----------------:| ---------:| ----------:|
+| Coming soon       | [BPE codes](https://modelrelease.blob.core.windows.net/mass/codes_en) | [Vocabulary](https://modelrelease.blob.core.windows.net/mass/vocab_en) |
+
 For pre-training, we use the following command:
 ### Pre-training:
 ```
