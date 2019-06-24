@@ -21,7 +21,7 @@
 The current codebase is for unsupersied neural machine translation. We will release our implementation for supervised machine translation, and other language generation tasks in the future.
 
 
-## [Unsupervised NMT](Unsupervised/)
+## Unsupervised NMT
 
 Unsupervised Neural Machine Translation just uses monolingual data to train the models. For this task, we implement MASS on [XLM](https://github.com/facebookresearch/XLM).
 
@@ -108,7 +108,7 @@ python train.py \
   --reload_model "$MODEL,$MODEL"                       \
 ```
 
-## [Text Summarization](Unsupervised)
+## Text Summarization
 To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
 
 For pre-training, we use the following command:
