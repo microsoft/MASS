@@ -246,6 +246,7 @@ class TransformerModel(nn.Module):
         self.dico = dico
         self.id2lang = params.id2lang
         self.lang2id = params.lang2id
+        self.english_only = params.english_only
         assert len(self.dico) == self.n_words
         assert len(self.id2lang) == len(self.lang2id) == self.n_langs
 
@@ -283,7 +284,9 @@ class TransformerModel(nn.Module):
             self.layer_norm1.append(nn.LayerNorm(self.dim, eps=1e-12))
             if self.is_decoder:
                 self.layer_norm15.append(nn.LayerNorm(self.dim, eps=1e-12))
-                if self.attention_setting == "v1":
+                if self.english_only is True:
+                    self.encoder_attn.append(MultiHeadAttention(self.n_heads, self.dim, dropout=self.attention_dropout))
+                elif self.attention_setting == "v1":
                     self.encoder_attn.append(MultiHeadAttention(self.n_heads, self.dim, dropout=self.attention_dropout, n_langs=self.n_langs))
                 else:
                     self.encoder_attn.append(nn.ModuleList([
@@ -366,7 +369,7 @@ class TransformerModel(nn.Module):
         # embeddings
         tensor = self.embeddings(x)
         tensor = tensor + self.position_embeddings(positions).expand_as(tensor)
-        if langs is not None:
+        if langs is not None and self.english_only is False:
             tensor = tensor + self.lang_embeddings(langs)
         tensor = self.layer_norm_emb(tensor)
         tensor = F.dropout(tensor, p=self.dropout, training=self.training)
@@ -384,7 +387,9 @@ class TransformerModel(nn.Module):
 
             # encoder attention (for decoder only)
             if self.is_decoder and src_enc is not None:
-                if self.attention_setting == "v1":
+                if self.english_only is True:
+                    attn = self.encoder_attn[i](tensor, src_mask, kv=src_enc, cache=cache)
+                elif self.attention_setting == "v1":
                     attn = self.encoder_attn[i](tensor, src_mask, kv=src_enc, cache=cache, segment_label=lang_id)
                 else:
                     attn = self.encoder_attn[i][lang_id](tensor, src_mask, kv=src_enc, cache=cache)

@@ -214,7 +214,7 @@ class Dataset(object):
         n_sentences = len(self.pos) if n_sentences == -1 else n_sentences
         assert 0 < n_sentences <= len(self.pos)
         assert type(shuffle) is bool and type(group_by_size) is bool
-        assert group_by_size is False or shuffle is True
+        #assert group_by_size is False or shuffle is True
 
         # sentence lengths
         lengths = self.lengths + 2

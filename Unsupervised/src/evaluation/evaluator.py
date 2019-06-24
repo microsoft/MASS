@@ -62,6 +62,9 @@ class Evaluator(object):
             n_sentences = -1
             subsample = 1
 
+        if self.params.english_only is True:
+            n_sentences = 50
+
         if lang2 is None:
             if stream:
                 iterator = self.data['mono_stream'][lang1][data_set].get_iterator(shuffle=False, subsample=subsample)
@@ -175,6 +178,9 @@ class Evaluator(object):
                 for lang1, lang2 in params.mlm_steps:
                     self.evaluate_mlm(scores, data_set, lang1, lang2)
                 
+                if params.english_only is True:
+                    for lang in params.mass_steps:
+                        self.evaluate_mass(scores, data_set, lang)
                 
                 mass_steps = []
                 for lang1 in params.mass_steps:
@@ -327,6 +333,56 @@ class EncDecEvaluator(Evaluator):
         super().__init__(trainer, data, params)
         self.encoder = trainer.encoder
         self.decoder = trainer.decoder
+
+    def evaluate_mass(self, scores, data_set, lang):
+        params = self.params
+        assert data_set in ['valid', 'test']
+        assert lang in params.langs
+
+        self.encoder.eval()
+        self.decoder.eval()
+        encoder = self.encoder.module if params.multi_gpu else self.encoder
+        decoder = self.decoder.module if params.multi_gpu else self.decoder
+
+        params = params
+        lang_id = params.lang2id[lang]
+
+        n_words = 0
+        xe_loss = 0
+        n_valid = 0
+        
+        for (x1, len1) in self.get_iterator(data_set, lang):
+            (x2, len2) = (x1, len1)
+
+            langs1 = x1.clone().fill_(lang_id)
+            langs2 = x2.clone().fill_(lang_id)
+
+            alen = torch.arange(len2.max(), dtype=torch.long, device=len2.device)
+            pred_mask = alen[:, None] < len2[None] - 1  # do not predict anything given the last target word
+            y = x2[1:].masked_select(pred_mask[:-1])
+            assert len(y) == (len2 - 1).sum().item()
+            
+            # cuda
+            x1, len1, langs1, x2, len2, langs2, y = to_cuda(x1, len1, langs1, x2, len2, langs2, y)
+
+            # encode source sentence
+            enc1 = encoder('fwd', x=x1, lengths=len1, langs=langs1, causal=False)
+            enc1 = enc1.transpose(0, 1)
+
+            # decode target sentence
+            dec2 = decoder('fwd', x=x2, lengths=len2, langs=langs2, causal=True, src_enc=enc1, src_len=len1)
+
+            # loss
+            word_scores, loss = decoder('predict', tensor=dec2, pred_mask=pred_mask, y=y, get_scores=True)
+
+            # update stats
+            n_words += y.size(0)
+            xe_loss += loss.item() * len(y)
+            n_valid += (word_scores.max(1)[1] == y).sum().item()
+
+        # compute perplexity and prediction accuracy
+        scores['%s_%s-%s_mt_ppl' % (data_set, lang, lang)] = np.exp(xe_loss / n_words)
+        scores['%s_%s-%s_mt_acc' % (data_set, lang, lang)] = 100. * n_valid / n_words
 
     def evaluate_mt(self, scores, data_set, lang1, lang2, eval_bleu):
         """
