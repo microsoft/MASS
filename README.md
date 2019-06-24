@@ -116,8 +116,9 @@ To apply MASS on text summarization, we provide an example of how to run MASS pr
 |:-----------------:| ---------:| ----------:|
 | Coming soon       | [BPE codes](https://modelrelease.blob.core.windows.net/mass/codes_en) | [Vocabulary](https://modelrelease.blob.core.windows.net/mass/vocab_en) |
 
-For pre-training, we use the following command:
 ### Pre-training:
+For pre-training, we use the following command:
+
 ```
 python train.py                                      \
 --exp_name mass_english                              \
@@ -141,10 +142,9 @@ python train.py                                      \
 --english_only true
 ```
 
-### Fine-tuning Stage
+### Fine-tuning:
 Different from unsupervised NMT tasks, we directly use paired data (article-title) to fine-tune the pre-trained model. The fine-tuning command is:
 
-### Fine-tuning:
 ```
 MODEL=mass_en_1024.pth 
 
