@@ -374,8 +374,8 @@ class TransformerModel(nn.Module):
         tensor = self.layer_norm_emb(tensor)
         tensor = F.dropout(tensor, p=self.dropout, training=self.training)
         tensor *= mask.unsqueeze(-1).to(tensor.dtype)
-
-        lang_id = langs.max()
+        
+        lang_id = langs.max() if langs is not None else None 
         
         # transformer layers
         for i in range(self.n_layers):
