@@ -160,8 +160,6 @@ python train.py                                      \
 --epoch_size 200000                                  \
 --max_epoch 20                                       \
 --eval_bleu true                                     \
---word_mass 0.5                                      \
---min_len 5                                          \
 --english_only true                                  \
 --reload_model "$MODEL,$MODEL"
 ```
