@@ -62,10 +62,10 @@ class Evaluator(object):
             n_sentences = -1
             subsample = 1
 
-        if self.params.english_only is True:
-            n_sentences = 50
 
         if lang2 is None:
+            if self.params.english_only is True:
+                n_sentences = 300
             if stream:
                 iterator = self.data['mono_stream'][lang1][data_set].get_iterator(shuffle=False, subsample=subsample)
             else:
