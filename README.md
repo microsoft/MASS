@@ -1,4 +1,4 @@
-[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+# MASS
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2014-2)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2014-2?p=mass-masked-sequence-to-sequence-pre-training)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2014-1)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2014-1?p=mass-masked-sequence-to-sequence-pre-training)
@@ -7,30 +7,37 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016-3)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016-3?p=mass-masked-sequence-to-sequence-pre-training)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016-5)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016-5?p=mass-masked-sequence-to-sequence-pre-training)
 
+[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 
-
-
-# MASS
 
 [MASS](https://arxiv.org/pdf/1905.02450.pdf) is a novel pre-training method for sequence to sequence based language generation tasks. It randomly masks a sentence fragment in the encoder, and then predicts it in the decoder.
 
 ![img](figs/mass.png)
 
-MASS can be applied on cross-lingual tasks such as neural machine translation, and monolingual tasks such text summarization. The current codebase supports unsupervised, supervised neural machine translation, text summarization and conversational response generation. We will We will release our implementation for other sequence to sequence generation tasks in the future.
+MASS can be applied on cross-lingual tasks such as neural machine translation (NMT), and monolingual tasks such text summarization. The current codebase supports unsupervised and supervised NMT, text summarization and conversational response generation. We will release our implementation for other sequence to sequence generation tasks in the future.
 
 MASS contains the following codes:
 * [Unsupervised Neural Machine Translation](#unsupervised-nmt)
-* [Supervised Neural Machine Translation](#unsupervised-nmt)
+* [Supervised Neural Machine Translation](#supervised-nmt)
 * [Text Summarization](#text-summarization)
+* [Conversational Response Generation](#conversational-response-generation)
+
+
+## Dependencies
+Currently we implement MASS based on the codebase of [XLM](https://github.com/facebookresearch/XLM). The depencies are as follows:
+- Python 3
+- NumPy
+- PyTorch (version 0.4 and 1.0)
+- fastBPE (for BPE codes)
+- Moses (for tokenization)
+- Apex (for fp16 training)
 
 
 
 ## Unsupervised NMT
 
-Unsupervised Neural Machine Translation just uses monolingual data to train the models. For this task, we implement MASS on [XLM](https://github.com/facebookresearch/XLM).
-
-We also provide pre-trained and fine-tuned models:
+Unsupervised Neural Machine Translation just uses monolingual data to train the models. During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, back-translation is used to train the unsupervised models. We provide pre-trained and fine-tuned models:
 
 | Languages | Pre-trained Model | Fine-tuned Model | BPE codes | Vocabulary |
 |-----------|:-----------------:|:----------------:| ---------:| ----------:|
@@ -113,6 +120,9 @@ python train.py \
   --reload_model "$MODEL,$MODEL"                       \
 ```
 
+## Supervised NMT
+To be updated soon.
+
 ## Text Summarization
 To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
 
@@ -173,6 +183,11 @@ python train.py                                      \
 --english_only true                                  \
 --reload_model "$MODEL,$MODEL"
 ```
+
+
+## Conversational Response Generation
+To be updated soon.
+
 
 ## Reference
 
