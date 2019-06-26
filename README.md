@@ -1,3 +1,5 @@
+[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2014-2)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2014-2?p=mass-masked-sequence-to-sequence-pre-training)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2014-1)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2014-1?p=mass-masked-sequence-to-sequence-pre-training)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016?p=mass-masked-sequence-to-sequence-pre-training)
@@ -6,7 +8,6 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016-5)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016-5?p=mass-masked-sequence-to-sequence-pre-training)
 
 
-[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 
 
@@ -18,7 +19,9 @@
 
 ![img](figs/mass.png)
 
-The current codebase is for unsupersied neural machine translation. We will release our implementation for supervised machine translation, and other language generation tasks in the future.
+MASS can be applied on cross-lingual tasks such as neural machine translation, and monolingual tasks such text summarization. The current codebase supports unsupervised, low-resource and rich-resource NMT, text summarization and conversational response generation. We will We will release our implementation for other sequence to sequence generation tasks in the future.
+
+
 
 
 ## Unsupervised NMT
