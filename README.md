@@ -7,7 +7,6 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016-3)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016-3?p=mass-masked-sequence-to-sequence-pre-training)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/mass-masked-sequence-to-sequence-pre-training/unsupervised-machine-translation-on-wmt2016-5)](https://paperswithcode.com/sota/unsupervised-machine-translation-on-wmt2016-5?p=mass-masked-sequence-to-sequence-pre-training)
 
-[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
 
 
@@ -200,4 +199,9 @@ If you find MASS useful in your work, you can cite the paper as below:
         pages={5926--5936},
         year={2019}
     }
+
+
+
+
+[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
