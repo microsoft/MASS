@@ -11,16 +11,18 @@
 
 
 
-
-
 # MASS
 
 [MASS](https://arxiv.org/pdf/1905.02450.pdf) is a novel pre-training method for sequence to sequence based language generation tasks. It randomly masks a sentence fragment in the encoder, and then predicts it in the decoder.
 
 ![img](figs/mass.png)
 
-MASS can be applied on cross-lingual tasks such as neural machine translation, and monolingual tasks such text summarization. The current codebase supports unsupervised, low-resource and rich-resource NMT, text summarization and conversational response generation. We will We will release our implementation for other sequence to sequence generation tasks in the future.
+MASS can be applied on cross-lingual tasks such as neural machine translation, and monolingual tasks such text summarization. The current codebase supports unsupervised, supervised neural machine translation, text summarization and conversational response generation. We will We will release our implementation for other sequence to sequence generation tasks in the future.
 
+MASS contains the following codes:
+* [Unsupervised Neural Machine Translation](#unsupervised-nmt)
+* [Supervised Neural Machine Translation](#unsupervised-nmt)
+* [Text Summarization](#text-summarization)
 
 
 
