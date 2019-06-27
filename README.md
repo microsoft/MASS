@@ -127,6 +127,8 @@ During MASS pre-training, the source and target languages are pre-trained in one
 | Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth)      | [BPE codes]() | [Vocabulary]() |
 
 
+We will release the pre-trained and fine-tuned models for other langauge pairs in the future.
+
 Here is an example to show how to run mass fine-tuning on the WMT16 en-ro dataset.
 
 ### Data Ready
@@ -169,7 +171,6 @@ python train.py \
 ```
 
 
-We will release the pre-trained and fine-tuned models for other langauge pairs in the future.
 
 
 ## Text Summarization
