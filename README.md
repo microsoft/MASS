@@ -120,7 +120,14 @@ python train.py \
 ```
 
 ## Supervised NMT
-Here is an example to show how to run mass fine-tuning on the WMT16 en-ro dataset, which contains back-translation stage.
+During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, supervised sentence pairs are directly used to train the NMT models. We provide pre-trained and fine-tuned models:
+
+|Languages| Fine-tuned Model  | BPE codes | Vocabulary |
+|:--------:|:-----------------:| ---------:| ----------:|
+| Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth)      | [BPE codes]() | [Vocabulary]() |
+
+
+Here is an example to show how to run mass fine-tuning on the WMT16 en-ro dataset.
 
 ### Data Ready
 ```
@@ -160,7 +167,10 @@ python train.py \
 --eval_bleu true                                     \
 --reload_model "$MODEL,$MODEL"
 ```
-Here is the [download link](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth) of our current fine-tuned model in wmt16 en-ro.
+
+
+We will release the pre-trained and fine-tuned models for other langauge pairs in the future.
+
 
 ## Text Summarization
 To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
