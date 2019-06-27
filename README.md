@@ -122,9 +122,10 @@ python train.py \
 ## Supervised NMT
 During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, supervised sentence pairs are directly used to train the NMT models. We provide pre-trained and fine-tuned models:
 
-|Languages| Fine-tuned Model  | BPE codes | Vocabulary |
-|:--------:|:-----------------:| ---------:| ----------:|
-| Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth)      | [BPE codes]() | [Vocabulary]() |
+| Languages | Fine-tuned Model  | BPE codes | Vocabulary | BLEU |
+|:---------:|:-----------------:| ---------:| ----------:| ----:|
+| Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth)      | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_enro) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enro) | 39.1 |
+
 
 
 We will release the pre-trained and fine-tuned models for other langauge pairs in the future.
