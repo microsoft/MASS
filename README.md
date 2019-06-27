@@ -120,7 +120,47 @@ python train.py \
 ```
 
 ## Supervised NMT
-To be updated soon.
+Here is an example to show how to run mass fine-tuning on the WMT16 en-ro dataset, which contains back-translation stage.
+
+### Data Ready
+```
+wget https://dl.fbaipublicfiles.com/XLM/codes_enro
+wget https://dl.fbaipublicfiles.com/XLM/vocab_enro
+
+./get-data-bilingual-enro-nmt.sh --src en --tgt fr --reload_codes codes_enro --reload_vocab vocab_enro
+```
+
+### Fine-tuning:
+Download the mass pre-trained model from the above link. And use the following command to fine tune:
+```
+DATA_PATH=./data/processed/en-ro
+MODEL=mass_enro_1024.pth
+
+python train.py \
+--exp_name unsupMT_enro                              \
+--dump_path ./models/en-ro/                          \
+--exp_id wmt16_enro_ft                               \
+--data_path $DATA_PATH                               \
+--lgs 'en-ro'                                        \
+--bt_steps 'en-ro-en,ro-en-ro'                       \
+--encoder_only false                                 \
+--mt_steps 'en-ro,ro-en'                             \
+--emb_dim 1024                                       \
+--n_layers 6                                         \
+--n_heads 8                                          \
+--dropout 0.1                                        \
+--attention_dropout 0.1                              \
+--gelu_activation true                               \
+--tokens_per_batch 2000                              \
+--batch_size 32                                      \
+--bptt 256                                           \
+--optimizer adam_inverse_sqrt,beta1=0.9,beta2=0.98,lr=0.0001 \
+--epoch_size 200000                                  \
+--max_epoch 50                                       \
+--eval_bleu true                                     \
+--reload_model "$MODEL,$MODEL"
+```
+Here is the [download link](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth) of our current fine-tuned model in wmt16 en-ro.
 
 ## Text Summarization
 To apply MASS on text summarization, we provide an example of how to run MASS pre-training and fine-tuning on the [Gigaword](https://github.com/harvardnlp/sent-summary) dataset.
