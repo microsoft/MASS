@@ -73,7 +73,7 @@ TRAIN_TGT_BPE=$PROC_PATH/train.ar-ti.ti
 VALID_SRC_BPE=$PROC_PATH/valid.ar-ti.ar
 VALID_TGT_BPE=$PROC_PATH/valid.ar-ti.ti
 TEST_SRC_BPE=$PROC_PATH/test.ar-ti.ar
-TEST_TGT_BPE=$PROC_PATH/test.ar-ti.ar
+TEST_TGT_BPE=$PROC_PATH/test.ar-ti.ti
 
 BPE_CODES=$PROC_PATH/codes
 FULL_VOCAB=$PROC_PATH/vocab.ar-ti
