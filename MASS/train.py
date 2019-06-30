@@ -49,7 +49,7 @@ def get_parser():
     # only use an encoder (use a specific decoder for machine translation)
     parser.add_argument("--encoder_only", type=bool_flag, default=True,
                         help="Only use an encoder")
-    parser.add_argument("--english_only", type=bool_flag, default=True,
+    parser.add_argument("--english_only", type=bool_flag, default=False,
                         help="Only use english domain (equal to only use one language)")
 
     # model parameters
