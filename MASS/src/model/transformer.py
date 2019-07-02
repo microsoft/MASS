@@ -584,7 +584,7 @@ class TransformerModel(nn.Module):
             )
             assert tensor.size() == (1, bs * beam_size, self.dim)
             tensor = tensor.data[-1, :, :]               # (bs * beam_size, dim)
-            scores = self.pred_layer.get_scores(tensor, lang_id=tgt_lang_id)  # (bs * beam_size, n_words)
+            scores = self.pred_layer.get_scores(tensor)  # (bs * beam_size, n_words)
             scores = F.log_softmax(scores, dim=-1)       # (bs * beam_size, n_words)
             assert scores.size() == (bs * beam_size, n_words)
 
