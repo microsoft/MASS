@@ -183,7 +183,9 @@ To apply MASS on text summarization, we provide an example of how to run MASS pr
 
 | Pre-trained Model | BPE codes | Vocabulary |
 |:-----------------:| ---------:| ----------:|
-| Coming soon       | [BPE codes](https://modelrelease.blob.core.windows.net/mass/codes_en) | [Vocabulary](https://modelrelease.blob.core.windows.net/mass/vocab_en) |
+| [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_summarization_1024.pth)       | [BPE codes](https://modelrelease.blob.core.windows.net/mass/codes_en) | [Vocabulary](https://modelrelease.blob.core.windows.net/mass/vocab_en) |
+
+Our model is still under training. We will update it if have a better model.
 
 ### Pre-training:
 For pre-training, we use the following command:
