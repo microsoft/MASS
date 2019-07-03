@@ -1,4 +1,4 @@
-# MASS on fairseq
+# MASS with Supervised Pre-training
 
 We implement MASS on [fairseq](https://github.com/pytorch/fairseq), in order to support the pre-training and fine-tuning for large scale supervised tasks, such as neural machine translation, text summarization, grammatical error correction. Unsupervised pre-training usually works better in zero-resource or low-resource downstream tasks. However, there are plenty of supervised data in these tasks, which brings challenges for conventional unsupervised pre-training. Therefore, we design new pre-training loss to support large scale supervised tasks.
 
