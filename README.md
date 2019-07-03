@@ -23,6 +23,9 @@ MASS contains the following codes:
 * [Conversational Response Generation](#conversational-response-generation)
 
 
+!! In order to satisfy more users and developers in sequence to sequence tasks, we also implement MASS on [fairseq](https://github.com/pytorch/fairseq) to support supervised pre-training and fine-tuning for large scale supervised tasks, such as neural machine translation, text summarization, grammatical error correction. Please go to this folder for detailed guides.
+
+
 ## Dependencies
 Currently we implement MASS based on the codebase of [XLM](https://github.com/facebookresearch/XLM). The depencies are as follows:
 - Python 3
