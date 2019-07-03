@@ -1,0 +1,486 @@
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the LICENSE file in
+# the root directory of this source tree. An additional grant of patent rights
+# can be found in the PATENTS file in the same directory.
+
+from collections import defaultdict, OrderedDict
+from typing import Callable
+import copy
+import importlib.util
+import logging
+import os
+import re
+import sys
+import traceback
+import warnings
+
+import torch
+import torch.nn.functional as F
+from torch.serialization import default_restore_location
+
+from fairseq.modules import gelu, gelu_fast
+
+
+def torch_persistent_save(*args, **kwargs):
+    for i in range(3):
+        try:
+            return torch.save(*args, **kwargs)
+        except Exception:
+            if i == 2:
+                logging.error(traceback.format_exc())
+
+
+def convert_state_dict_type(state_dict, ttype=torch.FloatTensor):
+    if isinstance(state_dict, dict):
+        cpu_dict = OrderedDict()
+        for k, v in state_dict.items():
+            cpu_dict[k] = convert_state_dict_type(v)
+        return cpu_dict
+    elif isinstance(state_dict, list):
+        return [convert_state_dict_type(v) for v in state_dict]
+    elif torch.is_tensor(state_dict):
+        return state_dict.type(ttype)
+    else:
+        return state_dict
+
+
+def save_state(filename, args, model_state_dict, criterion, optimizer, lr_scheduler,
+               num_updates, optim_history=None, extra_state=None):
+    if optim_history is None:
+        optim_history = []
+    if extra_state is None:
+        extra_state = {}
+    state_dict = {
+        'args': args,
+        'model': model_state_dict if model_state_dict else {},
+        'optimizer_history': optim_history + [
+            {
+                'criterion_name': criterion.__class__.__name__,
+                'optimizer_name': optimizer.__class__.__name__,
+                'lr_scheduler_state': lr_scheduler.state_dict(),
+                'num_updates': num_updates,
+            }
+        ],
+        'last_optimizer_state': convert_state_dict_type(optimizer.state_dict()),
+        'extra_state': extra_state,
+    }
+    torch_persistent_save(state_dict, filename)
+
+
+def load_pretrained_model(filename, model):
+    state = torch.load(filename, map_location=lambda s, l: default_restore_location(s, 'cpu'))
+    state = _upgrade_state_dict(state)
+    model.upgrade_state_dict(state['model'])
+    model.load_state_dict(state['model'], strict=False)
+
+
+def load_model_state(filename, model):
+    if not os.path.exists(filename):
+        return None, [], None
+    state = torch.load(filename, map_location=lambda s, l: default_restore_location(s, 'cpu'))
+    state = _upgrade_state_dict(state)
+    model.upgrade_state_dict(state['model'])
+
+    # load model parameters
+    try:
+        model.load_state_dict(state['model'], strict=True)
+    except Exception:
+        raise Exception('Cannot load model parameters from checkpoint, '
+                        'please ensure that the architectures match')
+
+    return state['extra_state'], state['optimizer_history'], state['last_optimizer_state']
+
+
+def _upgrade_state_dict(state):
+    """Helper for upgrading old model checkpoints."""
+    # add optimizer_history
+    if 'optimizer_history' not in state:
+        state['optimizer_history'] = [
+            {
+                'criterion_name': 'CrossEntropyCriterion',
+                'best_loss': state['best_loss'],
+            },
+        ]
+        state['last_optimizer_state'] = state['optimizer']
+        del state['optimizer']
+        del state['best_loss']
+    # move extra_state into sub-dictionary
+    if 'epoch' in state and 'extra_state' not in state:
+        state['extra_state'] = {
+            'epoch': state['epoch'],
+            'batch_offset': state['batch_offset'],
+            'val_loss': state['val_loss'],
+        }
+        del state['epoch']
+        del state['batch_offset']
+        del state['val_loss']
+    # reduce optimizer history's memory usage (only keep the last state)
+    if 'optimizer' in state['optimizer_history'][-1]:
+        state['last_optimizer_state'] = state['optimizer_history'][-1]['optimizer']
+        for optim_hist in state['optimizer_history']:
+            del optim_hist['optimizer']
+    # record the optimizer class name
+    if 'optimizer_name' not in state['optimizer_history'][-1]:
+        state['optimizer_history'][-1]['optimizer_name'] = 'FairseqNAG'
+    # move best_loss into lr_scheduler_state
+    if 'lr_scheduler_state' not in state['optimizer_history'][-1]:
+        state['optimizer_history'][-1]['lr_scheduler_state'] = {
+            'best': state['optimizer_history'][-1]['best_loss'],
+        }
+        del state['optimizer_history'][-1]['best_loss']
+    # keep track of number of updates
+    if 'num_updates' not in state['optimizer_history'][-1]:
+        state['optimizer_history'][-1]['num_updates'] = 0
+    # old model checkpoints may not have separate source/target positions
+    if hasattr(state['args'], 'max_positions') and not hasattr(state['args'], 'max_source_positions'):
+        state['args'].max_source_positions = state['args'].max_positions
+        state['args'].max_target_positions = state['args'].max_positions
+    # use stateful training data iterator
+    if 'train_iterator' not in state['extra_state']:
+        state['extra_state']['train_iterator'] = {
+            'epoch': state['extra_state']['epoch'],
+            'iterations_in_epoch': state['extra_state'].get('batch_offset', 0),
+        }
+    return state
+
+
+def load_checkpoint_to_cpu(path):
+    state = torch.load(path, map_location=lambda s, l: default_restore_location(s, 'cpu'))
+    state = _upgrade_state_dict(state)
+    return state
+
+
+def load_ensemble_for_inference(filenames, task, model_arg_overrides=None):
+    """Load an ensemble of models for inference.
+
+    model_arg_overrides allows you to pass a dictionary model_arg_overrides --
+    {'arg_name': arg} -- to override model args that were used during model
+    training
+    """
+    # load model architectures and weights
+    states = []
+    for filename in filenames:
+        if not os.path.exists(filename):
+            raise IOError('Model file not found: {}'.format(filename))
+        state = load_checkpoint_to_cpu(filename)
+        states.append(state)
+
+    ensemble = []
+    for state in states:
+        args = state['args']
+
+        if model_arg_overrides is not None:
+            args = override_model_args(args, model_arg_overrides)
+
+        # build model for ensemble
+        model = task.build_model(args)
+        model.upgrade_state_dict(state['model'])
+        model.load_state_dict(state['model'], strict=True)
+        ensemble.append(model)
+
+        # some args (e.g., tokens_per_sample) might have been updated while building the model
+        if model_arg_overrides is not None:
+            args = override_model_args(args, model_arg_overrides)
+
+    return ensemble, args
+
+
+def override_model_args(args, model_arg_overrides):
+    # Uses model_arg_overrides {'arg_name': arg} to override model args
+    for arg_name, arg_val in model_arg_overrides.items():
+        setattr(args, arg_name, arg_val)
+    return args
+
+
+def move_to_cuda(sample):
+    if len(sample) == 0:
+        return {}
+
+    def _move_to_cuda(maybe_tensor):
+        if torch.is_tensor(maybe_tensor):
+            return maybe_tensor.cuda()
+        elif isinstance(maybe_tensor, dict):
+            return {
+                key: _move_to_cuda(value)
+                for key, value in maybe_tensor.items()
+            }
+        elif isinstance(maybe_tensor, list):
+            return [_move_to_cuda(x) for x in maybe_tensor]
+        else:
+            return maybe_tensor
+
+    return _move_to_cuda(sample)
+
+
+INCREMENTAL_STATE_INSTANCE_ID = defaultdict(lambda: 0)
+
+
+def _get_full_incremental_state_key(module_instance, key):
+    module_name = module_instance.__class__.__name__
+
+    # assign a unique ID to each module instance, so that incremental state is
+    # not shared across module instances
+    if not hasattr(module_instance, '_fairseq_instance_id'):
+        INCREMENTAL_STATE_INSTANCE_ID[module_name] += 1
+        module_instance._fairseq_instance_id = INCREMENTAL_STATE_INSTANCE_ID[module_name]
+
+    return '{}.{}.{}'.format(module_name, module_instance._fairseq_instance_id, key)
+
+
+def get_incremental_state(module, incremental_state, key):
+    """Helper for getting incremental state for an nn.Module."""
+    full_key = _get_full_incremental_state_key(module, key)
+    if incremental_state is None or full_key not in incremental_state:
+        return None
+    return incremental_state[full_key]
+
+
+def set_incremental_state(module, incremental_state, key, value):
+    """Helper for setting incremental state for an nn.Module."""
+    if incremental_state is not None:
+        full_key = _get_full_incremental_state_key(module, key)
+        incremental_state[full_key] = value
+
+
+def load_align_dict(replace_unk):
+    if replace_unk is None:
+        align_dict = None
+    elif isinstance(replace_unk, str):
+        # Load alignment dictionary for unknown word replacement if it was passed as an argument.
+        align_dict = {}
+        with open(replace_unk, 'r') as f:
+            for line in f:
+                cols = line.split()
+                align_dict[cols[0]] = cols[1]
+    else:
+        # No alignment dictionary provided but we still want to perform unknown word replacement by copying the
+        # original source word.
+        align_dict = {}
+    return align_dict
+
+
+def print_embed_overlap(embed_dict, vocab_dict):
+    embed_keys = set(embed_dict.keys())
+    vocab_keys = set(vocab_dict.symbols)
+    overlap = len(embed_keys & vocab_keys)
+    print("| Found {}/{} types in embedding file.".format(overlap, len(vocab_dict)))
+
+
+def parse_embedding(embed_path):
+    """Parse embedding text file into a dictionary of word and embedding tensors.
+
+    The first line can have vocabulary size and dimension. The following lines
+    should contain word and embedding separated by spaces.
+
+    Example:
+        2 5
+        the -0.0230 -0.0264  0.0287  0.0171  0.1403
+        at -0.0395 -0.1286  0.0275  0.0254 -0.0932
+    """
+    embed_dict = {}
+    with open(embed_path) as f_embed:
+        next(f_embed)  # skip header
+        for line in f_embed:
+            pieces = line.rstrip().split(" ")
+            embed_dict[pieces[0]] = torch.Tensor([float(weight) for weight in pieces[1:]])
+    return embed_dict
+
+
+def load_embedding(embed_dict, vocab, embedding):
+    for idx in range(len(vocab)):
+        token = vocab[idx]
+        if token in embed_dict:
+            embedding.weight.data[idx] = embed_dict[token]
+    return embedding
+
+
+def replace_unk(hypo_str, src_str, alignment, align_dict, unk):
+    from fairseq import tokenizer
+    # Tokens are strings here
+    hypo_tokens = tokenizer.tokenize_line(hypo_str)
+    # TODO: Very rare cases where the replacement is '<eos>' should be handled gracefully
+    src_tokens = tokenizer.tokenize_line(src_str) + ['<eos>']
+    for i, ht in enumerate(hypo_tokens):
+        if ht == unk:
+            src_token = src_tokens[alignment[i]]
+            # Either take the corresponding value in the aligned dictionary or just copy the original value.
+            hypo_tokens[i] = align_dict.get(src_token, src_token)
+    return ' '.join(hypo_tokens)
+
+
+def post_process_prediction(hypo_tokens, src_str, alignment, align_dict, tgt_dict, remove_bpe):
+    from fairseq import tokenizer
+    hypo_str = tgt_dict.string(hypo_tokens, remove_bpe)
+    if align_dict is not None:
+        hypo_str = replace_unk(hypo_str, src_str, alignment, align_dict, tgt_dict.unk_string())
+    if align_dict is not None or remove_bpe is not None:
+        # Convert back to tokens for evaluating with unk replacement or without BPE
+        # Note that the dictionary can be modified inside the method.
+        hypo_tokens = tgt_dict.encode_line(hypo_str, add_if_not_exist=True)
+    return hypo_tokens, hypo_str, alignment
+
+
+def make_positions(tensor, padding_idx, onnx_trace=False):
+    """Replace non-padding symbols with their position numbers.
+
+    Position numbers begin at padding_idx+1. Padding symbols are ignored.
+    """
+    mask = tensor.ne(padding_idx).long()
+    return torch.cumsum(mask, dim=1) * mask + padding_idx
+
+
+def strip_pad(tensor, pad):
+    return tensor[tensor.ne(pad)]
+
+
+def buffered_arange(max):
+    if not hasattr(buffered_arange, 'buf'):
+        buffered_arange.buf = torch.LongTensor()
+    if max > buffered_arange.buf.numel():
+        torch.arange(max, out=buffered_arange.buf)
+    return buffered_arange.buf[:max]
+
+
+def convert_padding_direction(src_tokens, padding_idx, right_to_left=False, left_to_right=False):
+    assert right_to_left ^ left_to_right
+    pad_mask = src_tokens.eq(padding_idx)
+    if not pad_mask.any():
+        # no padding, return early
+        return src_tokens
+    if left_to_right and not pad_mask[:, 0].any():
+        # already right padded
+        return src_tokens
+    if right_to_left and not pad_mask[:, -1].any():
+        # already left padded
+        return src_tokens
+    max_len = src_tokens.size(1)
+    range = buffered_arange(max_len).type_as(src_tokens).expand_as(src_tokens)
+    num_pads = pad_mask.long().sum(dim=1, keepdim=True)
+    if right_to_left:
+        index = torch.remainder(range - num_pads, max_len)
+    else:
+        index = torch.remainder(range + num_pads, max_len)
+    return src_tokens.gather(1, index)
+
+
+def item(tensor):
+    if hasattr(tensor, 'item'):
+        return tensor.item()
+    if hasattr(tensor, '__getitem__'):
+        return tensor[0]
+    return tensor
+
+
+def clip_grad_norm_(tensor, max_norm):
+    grad_norm = item(torch.norm(tensor))
+    if grad_norm > max_norm > 0:
+        clip_coef = max_norm / (grad_norm + 1e-6)
+        tensor.mul_(clip_coef)
+    return grad_norm
+
+
+def fill_with_neg_inf(t):
+    """FP16-compatible function that fills a tensor with -inf."""
+    return t.float().fill_(float('-inf')).type_as(t)
+
+
+def checkpoint_paths(path, pattern=r'checkpoint(\d+)\.pt'):
+    """Retrieves all checkpoints found in `path` directory.
+
+    Checkpoints are identified by matching filename to the specified pattern. If
+    the pattern contains groups, the result will be sorted by the first group in
+    descending order.
+    """
+    pt_regexp = re.compile(pattern)
+    files = os.listdir(path)
+
+    entries = []
+    for i, f in enumerate(files):
+        m = pt_regexp.fullmatch(f)
+        if m is not None:
+            idx = int(m.group(1)) if len(m.groups()) > 0 else i
+            entries.append((idx, m.group(0)))
+    return [os.path.join(path, x[1]) for x in sorted(entries, reverse=True)]
+
+
+def resolve_max_positions(*args):
+    """Resolve max position constraints from multiple sources."""
+
+    def map_value_update(d1, d2):
+        updated_value = copy.deepcopy(d1)
+        for key in d2:
+            if key not in updated_value:
+                updated_value[key] = d2[key]
+            else:
+                updated_value[key] = min(d1[key], d2[key])
+        return updated_value
+
+    def nullsafe_min(l):
+        minim = None
+        for item in l:
+            if minim is None:
+                minim = item
+            elif item is not None and item < minim:
+                minim = item
+        return minim
+
+    max_positions = None
+    for arg in args:
+        if max_positions is None:
+            max_positions = arg
+        elif arg is not None:
+            if isinstance(arg, float) or isinstance(arg, int):
+                max_positions = min(max_positions, arg)
+            elif isinstance(arg, dict):
+                max_positions = map_value_update(max_positions, arg)
+            else:
+                max_positions = tuple(
+                    map(nullsafe_min, zip(max_positions, arg))
+                )
+
+    return max_positions
+
+
+def import_user_module(args):
+    module_path = getattr(args, 'user_dir', None)
+    if module_path is not None:
+        module_path = os.path.abspath(args.user_dir)
+        module_parent, module_name = os.path.split(module_path)
+
+        if module_name not in sys.modules:
+            sys.path.insert(0, module_parent)
+            importlib.import_module(module_name)
+            sys.path.pop(0)
+
+
+def softmax(x, dim, onnx_trace=False):
+    if onnx_trace:
+        return F.softmax(x.float(), dim=dim)
+    else:
+        return F.softmax(x, dim=dim, dtype=torch.float32)
+
+
+def log_softmax(x, dim, onnx_trace=False):
+    if onnx_trace:
+        return F.log_softmax(x.float(), dim=dim)
+    else:
+        return F.log_softmax(x, dim=dim, dtype=torch.float32)
+
+
+def deprecation_warning(message, stacklevel=3):
+    # don't use DeprecationWarning, since it's ignored by default
+    warnings.warn(message, stacklevel=stacklevel)
+
+
+def get_activation_fn(activation: str) -> Callable:
+    """ Returns the activation function corresponding to `activation` """
+    if activation == 'relu':
+        return F.relu
+    elif activation == 'gelu':
+        return gelu
+    elif activation == 'gelu_fast':
+        return gelu_fast
+    else:
+        raise RuntimeError(f"--activation-fn {activation} not supported")
