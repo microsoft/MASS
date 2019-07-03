@@ -15,6 +15,10 @@ MASS on fairseq contains the following codes:
 
 ## Neural Machine Translation 
 
+| Languages | Pre-trained Model | BPE codes | English-Dict | Chinese-Dict |
+|:-----------:|:-----------------:| :---------:| :------------:| :------------:|
+|En - Zh      | [MODEL](https://modelrelease.blob.core.windows.net/mass/zhen_mass_pre-training.pt) | | [VOCAB](https://modelrelease.blob.core.windows.net/mass/dict.en.txt) | [VOCAB](https://modelrelease.blob.core.windows.net/mass/dict.zh.txt)
+
 We provide an example of how to pre-train and fine-tune on WMT English<->Chinese(En<->Zh) translation.
 
 ### Data Ready
