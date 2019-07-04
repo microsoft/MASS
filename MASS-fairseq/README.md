@@ -41,7 +41,7 @@ data/
     |-- dict.en.txt
     |-- dict.zh.txt
 ```
-The files under `mono` are monolingual data, while under `para` are bilingual data. `dict.en(zh).txt` in different directary should be identical. The dictionary for different language can be different. The following command will generate the binarized data:
+The files under `mono` are monolingual data, while under `para` are bilingual data. `dict.en(zh).txt` in different directory should be identical. The dictionary for different language can be different. The following command will generate the binarized data:
 
 ```
 # Ensure the output directory exists
