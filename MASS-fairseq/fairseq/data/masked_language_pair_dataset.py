@@ -1,5 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+#
+# This source code is licensed under the license found in the
+# NOTICE FILE in the root directory of this source tree.
+#
+
 
 import numpy as np
 import torch
