@@ -1,3 +1,7 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+
 MAIN_PATH=$(pwd)
 
 N_MONO=10000000  # number of monolingual sentences for each language
