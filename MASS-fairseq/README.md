@@ -189,11 +189,11 @@ python train.py data/processed/ \
     --decoder-embed-dim ${embed_dim} --encoder-embed-dim ${embed_dim} \
     --decoder-ffn-embed-dim ${ffn_embed_dim} --encoder-ffn-embed-dim ${ffn_embed_dim} \
     --encoder-layers ${encoder_layers} --decoder-layers ${decoder_layers} \
-    --max-update 10 --max-epoch 50 \
+    --max-update 1000000 --max-epoch 50 \
     --keep-interval-updates 100 --save-interval-updates 3000  --log-interval 50 \
     --share-decoder-input-output-embed \
     --valid-lang-pairs zh-en \
-    --reload-checkpoint $model
+    --reload_checkpoint $model
 ```
 
 
