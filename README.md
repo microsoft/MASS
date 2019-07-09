@@ -23,7 +23,7 @@ MASS contains the following codes:
 * [Conversational Response Generation](#conversational-response-generation)
 
 
-**!!!In order to satisfy more users and developers in sequence to sequence tasks, we also implement MASS on fairseq, which will foucs more on the pre-training and fine-tuning in large scale supervised tasks, including neural machine translation, text summarization, grammatical error correction, etc. We will soon release the codes.** 
+**!!!In order to satisfy more users and developers in sequence to sequence tasks, we also implement MASS on fairseq, which will foucs more on the pre-training and fine-tuning in large scale supervised tasks, including neural machine translation, text summarization, grammatical error correction, etc. We release the codes in [MASS-fairseq](MASS-fairseq) folder.** 
 
 
 ## Dependencies
