@@ -13,6 +13,14 @@ MASS on fairseq contains the following codes:
 * [Grammatical Error Correction](#grammatical-error-correction)
 
 
+
+## Prerequisites
+After download the repository, you need to install `fairseq` by `pip`:
+```
+pip install fairseq==0.7.1
+```
+
+
 ## Neural Machine Translation 
 
 | Languages | Pre-trained Model | BPE codes | English-Dict | Chinese-Dict |
@@ -20,12 +28,6 @@ MASS on fairseq contains the following codes:
 |En - Zh      | [MODEL](https://modelrelease.blob.core.windows.net/mass/zhen_mass_pre-training.pt) | [CODE](https://modelrelease.blob.core.windows.net/mass/bpecode.zip) | [VOCAB](https://modelrelease.blob.core.windows.net/mass/dict.en.txt) | [VOCAB](https://modelrelease.blob.core.windows.net/mass/dict.zh.txt)
 
 We provide an example of how to pre-train and fine-tune on WMT English<->Chinese (En<->Zh) translation.
-
-### Prerequisites
-After download the repository, you need to install `fairseq` by `pip`:
-```
-pip install fairseq==0.7.1
-```
 
 
 ### Data Ready
