@@ -42,3 +42,4 @@ fairseq-train $data_dir \
     --share-decoder-input-output-embed \
     --valid-lang-pairs en-zh \
 	--word_mask ${word_mask} \
+	--ddp-backend=no_c10d

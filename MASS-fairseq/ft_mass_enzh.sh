@@ -40,4 +40,5 @@ fairseq-train $data_dir \
 	--keep-interval-updates 100 --save-interval-updates 3000  --log-interval 50 \
 	--share-decoder-input-output-embed \
 	--valid-lang-pairs zh-en \
-	--reload-checkpoint $model
+	--reload-checkpoint $model \
+	--ddp-backend=no_c10d
