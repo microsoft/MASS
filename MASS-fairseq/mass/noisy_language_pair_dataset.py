@@ -93,6 +93,7 @@ class NoisyLanguagePairDataset(FairseqDataset):
         left_pad_source=True, left_pad_target=False,
         max_source_positions=1024, max_target_positions=1024,
         shuffle=True, input_feeding=True, ratio=0.50,
+        pred_probs=None,
     ):
         self.src = src
         self.tgt = tgt
@@ -109,6 +110,7 @@ class NoisyLanguagePairDataset(FairseqDataset):
         self.shuffle = shuffle
         self.input_feeding = input_feeding
         self.ratio = ratio
+        self.pred_probs = pred_probs
 
     def __getitem__(self, index):
         tgt_item = self.tgt[index]
@@ -118,7 +120,7 @@ class NoisyLanguagePairDataset(FairseqDataset):
         source = []
         for i, w in enumerate(src_list):
             p = np.random.random()
-            if i > 0 and i < len(src_list) - 1 and p >= self.ratio:
+            if i > 0 and i < len(src_list) - 1 and p <= self.ratio:
                 source.append(self.src_vocab.mask_index)
             else:
                 source.append(w)

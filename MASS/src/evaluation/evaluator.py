@@ -178,9 +178,8 @@ class Evaluator(object):
                 for lang1, lang2 in params.mlm_steps:
                     self.evaluate_mlm(scores, data_set, lang1, lang2)
                 
-                if params.english_only is True:
-                    for lang in params.mass_steps:
-                        self.evaluate_mass(scores, data_set, lang)
+                for lang in params.mass_steps:
+                    self.evaluate_mass(scores, data_set, lang)
                 
                 mass_steps = []
                 for lang1 in params.mass_steps:
@@ -344,45 +343,107 @@ class EncDecEvaluator(Evaluator):
         encoder = self.encoder.module if params.multi_gpu else self.encoder
         decoder = self.decoder.module if params.multi_gpu else self.decoder
 
+        rng = np.random.RandomState(0)
+
         params = params
         lang_id = params.lang2id[lang]
 
         n_words = 0
         xe_loss = 0
         n_valid = 0
-        
         for (x1, len1) in self.get_iterator(data_set, lang):
-            (x2, len2) = (x1, len1)
+            (x1, len1, x2, len2, y, pred_mask, positions) = self.mask_sent(x1, len1, rng)
 
             langs1 = x1.clone().fill_(lang_id)
             langs2 = x2.clone().fill_(lang_id)
 
-            alen = torch.arange(len2.max(), dtype=torch.long, device=len2.device)
-            pred_mask = alen[:, None] < len2[None] - 1  # do not predict anything given the last target word
-            y = x2[1:].masked_select(pred_mask[:-1])
-            assert len(y) == (len2 - 1).sum().item()
-            
             # cuda
-            x1, len1, langs1, x2, len2, langs2, y = to_cuda(x1, len1, langs1, x2, len2, langs2, y)
+            x1, len1, langs1, x2, len2, langs2, y, positions = to_cuda(x1, len1, langs1, x2, len2, langs2, y, positions)
 
             # encode source sentence
             enc1 = encoder('fwd', x=x1, lengths=len1, langs=langs1, causal=False)
             enc1 = enc1.transpose(0, 1)
 
+            enc_mask = x1.ne(params.mask_index)
+            enc_mask = enc_mask.transpose(0, 1)
             # decode target sentence
-            dec2 = decoder('fwd', x=x2, lengths=len2, langs=langs2, causal=True, src_enc=enc1, src_len=len1)
-
+            dec2 = decoder('fwd', x=x2, lengths=len2, 
+                           langs=langs2, causal=True, 
+                           src_enc=enc1, src_len=len1, positions=positions, enc_mask=enc_mask)
             # loss
             word_scores, loss = decoder('predict', tensor=dec2, pred_mask=pred_mask, y=y, get_scores=True)
-
+            
             # update stats
             n_words += y.size(0)
             xe_loss += loss.item() * len(y)
             n_valid += (word_scores.max(1)[1] == y).sum().item()
-
+            
         # compute perplexity and prediction accuracy
-        scores['%s_%s-%s_mt_ppl' % (data_set, lang, lang)] = np.exp(xe_loss / n_words)
-        scores['%s_%s-%s_mt_acc' % (data_set, lang, lang)] = 100. * n_valid / n_words
+        scores['%s_%s-%s_mass_ppl' % (data_set, lang, lang)] = np.exp(xe_loss / n_words)
+        scores['%s_%s-%s_mass_acc' % (data_set, lang, lang)] = 100. * n_valid / n_words
+
+    def mask_sent(self, x, lengths, rng):
+        
+        def random_start(end):
+            p = rng.rand()
+            if p >= 0.8:
+                return 1
+            elif p >= 0.6:
+                return end - 1
+            else:
+                return rng.randint(1, end)
+
+        def mask_word(w):
+            p = rng.rand()
+            if p >= 0.2:
+                return self.params.mask_index
+            elif p >= 0.05:
+                return rng.randint(self.params.n_words)
+            else:
+                return w
+
+        positions, inputs, targets, outputs, len2 = [], [], [], [], [] 
+        for i in range(lengths.size(0)):
+            words = x[:lengths[i], i].tolist()
+            l = len(words)
+            # Prevent some short sentences will be whole masked
+            mask_len = max(1, round(l * self.params.word_mass) - 1)
+            start = random_start(l - mask_len + 1)
+            len2.append(mask_len)
+
+            pos_i, target_i, output_i, input_i = [], [], [], []
+            prev_w = None
+            for j, w in enumerate(words):
+                if j >= start and j < start + mask_len:
+                    output_i.append(w)
+                    target_i.append(prev_w)
+                    pos_i.append(j - 1)
+                    input_i.append(mask_word(w))
+                else:
+                    input_i.append(w)
+                prev_w = w
+
+            inputs.append(input_i)
+            targets.append(target_i)
+            outputs.append(output_i)
+            positions.append(pos_i)
+
+        l1 = lengths.clone()
+        l2 = torch.LongTensor(len2)
+        x1 = torch.LongTensor(max(l1) , l1.size(0)).fill_(self.params.pad_index)
+        x2 = torch.LongTensor(max(len2), l1.size(0)).fill_(self.params.pad_index)
+        y  = torch.LongTensor(max(len2), l1.size(0)).fill_(self.params.pad_index)
+        pos = torch.LongTensor(max(len2), l1.size(0)).fill_(self.params.pad_index)
+        
+        for i in range(l1.size(0)):
+            x1[:l1[i], i].copy_(torch.LongTensor(inputs[i]))
+            x2[:l2[i], i].copy_(torch.LongTensor(targets[i]))
+            y[:l2[i], i].copy_(torch.LongTensor(outputs[i]))
+            pos[:l2[i], i].copy_(torch.LongTensor(positions[i]))
+        pred_mask = y != self.params.pad_index
+        y = y.masked_select(pred_mask)
+
+        return x1, l1, x2, l2, y, pred_mask, pos
 
     def evaluate_mt(self, scores, data_set, lang1, lang2, eval_bleu):
         """

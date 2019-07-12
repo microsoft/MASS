@@ -116,9 +116,6 @@ class XMassTranslationTask(FairseqTask):
         args.left_pad_target = options.eval_bool(args.left_pad_target)
         s = args.word_mask_keep_rand.split(',')
         s = [float(x) for x in s]
-        setattr(args, 'word_mask', s[0])
-        setattr(args, 'word_rand', s[1])
-        setattr(args, 'word_keep', s[2])
         setattr(args, 'pred_probs', torch.FloatTensor([s[0], s[1], s[2]]))
         
         args.langs = sorted(args.langs.split(','))
@@ -324,6 +321,7 @@ class XMassTranslationTask(FairseqTask):
                     max_source_positions=self.args.max_source_positions,
                     max_target_positions=self.args.max_target_positions,
                     ratio=self.args.word_mask,
+                    pred_probs=self.args.pred_probs,
                 )
 
         mass_mono_datasets = {}
