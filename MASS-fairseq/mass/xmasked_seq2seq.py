@@ -85,7 +85,7 @@ class XMassTranslationTask(FairseqTask):
 
         parser.add_argument('--word_mask', default=0.25, type=float, metavar='RATIO',
                             help='The mask ratio')
-        parser.add_argument('--word_mask_keep_rand', default="0,0,1", type=str,
+        parser.add_argument('--word_mask_keep_rand', default="0.1,0.1,0.8", type=str,
                             help='Word prediction proability')
 
         parser.add_argument('--reload-checkpoint', type=str, default=None,

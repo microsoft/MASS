@@ -180,7 +180,41 @@ fairseq-generate $data_dir \
 ```
 
 ## Text Summarization
-To be updated soon
+
+### Data Ready
+Download [CNN/Daily dataset](https://github.com/abisee/cnn-dailymail) and use Stanford CoreNLP to tokenize the data. We truncate the length of article as 400 tokens and use BPE to process data. 
+We use the similar data process pipeline as NMT to generate the binarized data.  
+
+### Pre-training
+Here is a demo code about how to run pre-training in text summarization:
+```
+save_dir=checkpoints/mass/pre-training/
+user_dir=mass
+data_dir=data/processed/
+
+mkdir -p $save_dir
+
+fairseq-train $data_dir \
+    --user-dir $user_dir \
+    --save-dir $save_dir \
+    --task xmasked_seq2seq \
+    --source-langs ar,ti \
+    --target-langs ar,ti \
+    --langs ar,ti \
+    --arch xtransformer \
+    --mass_steps ar-ar,ti-ti \
+    --memt_steps ar-ti \
+    --optimizer adam --adam-betas '(0.9, 0.98)' --clip-norm 0.0 \
+    --lr-scheduler inverse_sqrt --lr 0.0001 --min-lr 1e-09 \
+    --criterion label_smoothed_cross_entropy \
+    --max-tokens 4096 \
+    --dropout 0.1 --relu-dropout 0.1 --attention-dropout 0.1 \
+    --max-update 300000 \
+    --share-decoder-input-output-embed \
+    --valid-lang-pairs ar-ti \
+    --word_mask 0.15 
+```
+Our experiments are still ongoing, we will summarize a better experiment setting in the future.
 
 ## Grammatical Error Correction
 To be updated soon
