@@ -11,6 +11,7 @@
 import os
 import math
 import time
+import random
 from logging import getLogger
 from collections import OrderedDict
 import numpy as np
@@ -732,55 +733,93 @@ class EncDecTrainer(Trainer):
         super().__init__(data, params)
 
     def mask_word(self, w):
-        """
-        80% time for mask, 10% time for random word, 10% time for self 
-        or
-        80% time for mask, 15% time for random word, 5% time for self ? 
-        """
-        p = np.random.random()
-        if p >= 0.2:
-            return self.params.mask_index
-        elif p >= 0.05:
-            return np.random.randint(self.params.n_words)
-        else:
-            return w
+        _w_real = w
+        _w_rand = np.random.randint(self.params.n_words, size=w.shape)
+        _w_mask = np.full(w.shape, self.params.mask_index)
 
-    def random_start(self, end):
+        probs = torch.multinomial(self.params.pred_probs, len(_w_real), replacement=True)
+
+        _w = _w_mask * (probs == 0).numpy() + _w_real * (probs == 1).numpy() + _w_rand * (probs == 2).numpy()
+        return _w
+
+    def unfold_segments(self, segs):
+        """Unfold the random mask segments, for example:
+           The shuffle segment is [2, 0, 0, 2, 0], 
+           so the masked segment is like:
+           [1, 1, 0, 0, 1, 1, 0]
+           [1, 2, 3, 4, 5, 6, 7] (positions)
+           (1 means this token will be masked, otherwise not)
+           We return the position of the masked tokens like:
+           [1, 2, 5, 6]
+        """
+        pos = []
+        curr = 1   # We do not mask the start token
+        for l in segs:
+            if l >= 1:
+                pos.extend([curr + i for i in range(l)])
+                curr += l
+            else:
+                curr += 1
+        return np.array(pos)
+
+    def shuffle_segments(self, segs, unmasked_tokens):
         """
         We control 20% mask segment is at the start of sentences
                    20% mask segment is at the end   of sentences
                    60% mask segment is at random positions,
         """
+
         p = np.random.random()
         if p >= 0.8:
-            return 1
+            shuf_segs = segs[1:] + unmasked_tokens
         elif p >= 0.6:
-            return end - 1
+            shuf_segs = segs[:-1] + unmasked_tokens
         else:
-            return np.random.randint(1, end)
+            shuf_segs = segs + unmasked_tokens
 
-    def mask_sent(self, x, l):
+        random.shuffle(shuf_segs)
+        
+        if p >= 0.8:
+            shuf_segs = segs[0:1] + shuf_segs
+        elif p >= 0.6:
+            shuf_segs = shuf_segs + segs[-1:]
+        return shuf_segs
+
+    def get_segments(self, mask_len, min_len):
+        segs = []
+        while mask_len >= min_len:
+            segs.append(min_len)
+            mask_len -= min_len
+        if mask_len != 0:
+            segs.append(mask_len)
+        return segs
+
+    def restricted_mask_sent(self, x, l, min_len=100000):
+        """ Restricted mask sents
+            if min_len is equal to 1, it can be viewed as
+            discrete mask;
+            if min_len -> inf, it can be viewed as 
+            pure sentence mask
+        """
+        if min_len <= 0:
+            min_len = 1
         max_len = 0
         positions, inputs, targets, outputs, = [], [], [], []
         mask_len = round(len(x[:, 0]) * self.params.word_mass)
         len2 = [mask_len for i in range(l.size(0))]
-
+        
+        unmasked_tokens = [0 for i in range(l[0] - mask_len - 1)]
+        segs = self.get_segments(mask_len, min_len)
+        
         for i in range(l.size(0)):
-            words = x[:l[i], i].tolist()
-            start = self.random_start(l[i] - mask_len + 1)
+            words = np.array(x[:l[i], i].tolist())
+            shuf_segs = self.shuffle_segments(segs, unmasked_tokens)
+            pos_i = self.unfold_segments(shuf_segs)
+            output_i = words[pos_i].copy()
+            target_i = words[pos_i - 1].copy()
+            words[pos_i] = self.mask_word(words[pos_i])
 
-            pos_i, target_i, output_i, input_i = [], [], [], []
-            prev_w = None
-            for j, w in enumerate(words):
-                if j >= start and j < start + mask_len:
-                    output_i.append(w) 
-                    target_i.append(prev_w)
-                    pos_i.append(j - 1)
-                    input_i.append(self.mask_word(w))
-                else:
-                    input_i.append(w)
-                prev_w = w
-            inputs.append(input_i)
+            inputs.append(words)
             targets.append(target_i)
             outputs.append(output_i)
             positions.append(pos_i)
@@ -788,7 +827,7 @@ class EncDecTrainer(Trainer):
         x1  = torch.LongTensor(max(l) , l.size(0)).fill_(self.params.pad_index)
         x2  = torch.LongTensor(mask_len, l.size(0)).fill_(self.params.pad_index)
         y   = torch.LongTensor(mask_len, l.size(0)).fill_(self.params.pad_index)
-        pos = torch.LongTensor(mask_len, l.size(0))
+        pos = torch.LongTensor(mask_len, l.size(0)).fill_(self.params.pad_index)
         l1  = l.clone()
         l2  = torch.LongTensor(len2)
         for i in range(l.size(0)):
@@ -932,7 +971,7 @@ class EncDecTrainer(Trainer):
         lang2_id = params.lang2id[lang]
         x_, len_ = self.get_batch('mass', lang)
 
-        (x1, len1, x2, len2, y, pred_mask, positions) = self.mask_sent(x_, len_)
+        (x1, len1, x2, len2, y, pred_mask, positions) = self.restricted_mask_sent(x_, len_)
 
         langs1 = x1.clone().fill_(lang1_id)
         langs2 = x2.clone().fill_(lang2_id)
