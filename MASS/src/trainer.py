@@ -822,7 +822,7 @@ class EncDecTrainer(Trainer):
             inputs.append(words)
             targets.append(target_i)
             outputs.append(output_i)
-            positions.append(pos_i)
+            positions.append(pos_i - 1)
 
         x1  = torch.LongTensor(max(l) , l.size(0)).fill_(self.params.pad_index)
         x2  = torch.LongTensor(mask_len, l.size(0)).fill_(self.params.pad_index)
@@ -835,6 +835,7 @@ class EncDecTrainer(Trainer):
             x2[:l2[i], i].copy_(torch.LongTensor(targets[i]))
             y[:l2[i], i].copy_(torch.LongTensor(outputs[i]))
             pos[:l2[i], i].copy_(torch.LongTensor(positions[i]))
+
         pred_mask = y != self.params.pad_index
         y = y.masked_select(pred_mask)
         return x1, l1, x2, l2, y, pred_mask, pos
