@@ -249,13 +249,14 @@ To be updated soon.
 
 If you find MASS useful in your work, you can cite the paper as below:
 
-    @inproceedings{song2019mass,
-        title={MASS: Masked Sequence to Sequence Pre-training for Language Generation},
+    @article{song2019mass,
+        title={Mass: Masked sequence to sequence pre-training for language generation},
         author={Song, Kaitao and Tan, Xu and Qin, Tao and Lu, Jianfeng and Liu, Tie-Yan},
-        booktitle={International Conference on Machine Learning},
-        pages={5926--5936},
+        journal={arXiv preprint arXiv:1905.02450},
         year={2019}
     }
+
+    
 
 
 
