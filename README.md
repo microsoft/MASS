@@ -40,7 +40,7 @@ Currently we implement MASS based on the codebase of [XLM](https://github.com/fa
 
 ## Unsupervised NMT
 
-Unsupervised Neural Machine Translation just uses monolingual data to train the models. During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, back-translation is used to train the unsupervised models. We provide pre-trained and fine-tuned models:
+Unsupervised Neural Machine Translation just uses monolingual data to train the models. During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding language embeddings to differentiate the languages. During MASS fine-tuning, back-translation is used to train the unsupervised models. We provide pre-trained and fine-tuned models:
 
 | Languages | Pre-trained Model | Fine-tuned Model | BPE codes | Vocabulary |
 |-----------|:-----------------:|:----------------:| ---------:| ----------:|
@@ -124,7 +124,7 @@ python train.py \
 ```
 
 ## Supervised NMT
-During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, supervised sentence pairs are directly used to train the NMT models. We provide pre-trained and fine-tuned models:
+During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding language embeddings to differentiate the languages. During MASS fine-tuning, supervised sentence pairs are directly used to train the NMT models. We provide pre-trained and fine-tuned models:
 
 | Languages | Fine-tuned Model  | BPE codes | Vocabulary | BLEU |
 |:---------:|:-----------------:| ---------:| ----------:|:----:|
@@ -132,7 +132,7 @@ During MASS pre-training, the source and target languages are pre-trained in one
 
 
 
-We will release the pre-trained and fine-tuned models for other langauge pairs in the future.
+We will release the pre-trained and fine-tuned models for other language pairs in the future.
 
 Here is an example to show how to run mass fine-tuning on the WMT16 en-ro dataset.
 
