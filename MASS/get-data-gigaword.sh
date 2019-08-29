@@ -69,7 +69,7 @@ TRAIN_TGT=$PARA_PATH/train.ar-ti.ti
 VALID_SRC=$PARA_PATH/valid.ar-ti.ar
 VALID_TGT=$PARA_PATH/valid.ar-ti.ti
 TEST_SRC=$PARA_PATH/test.ar-ti.ar
-TEST_TGT=$PARA_PATH/test.ar-ti.ar
+TEST_TGT=$PARA_PATH/test.ar-ti.ti
 
 TRAIN_SRC_BPE=$PROC_PATH/train.ar-ti.ar
 TRAIN_TGT_BPE=$PROC_PATH/train.ar-ti.ti
