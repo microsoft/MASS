@@ -24,7 +24,7 @@ MASS contains the following codes:
 * [Conversational Response Generation](#conversational-response-generation)
 
 
-**!!!In order to satisfy more users and developers in sequence to sequence tasks, we also implement MASS on fairseq, which will foucs more on the pre-training and fine-tuning in large scale supervised tasks, including neural machine translation, text summarization, grammatical error correction, etc. We release the codes in [MASS-fairseq](MASS-fairseq) folder.** 
+**!!!In order to satisfy more users and developers in sequence to sequence tasks, we also implement MASS on fairseq, which will focus more on the pre-training and fine-tuning in large scale supervised tasks, including neural machine translation, text summarization, grammatical error correction, etc. We release the codes in [MASS-fairseq](MASS-fairseq) folder.** 
 
 
 ## Dependencies
@@ -87,7 +87,7 @@ python train.py                                      \
 ```
 
 
-During the pre-training prcess, even without any back-translation, you can observe the model can achieve some intial BLEU scores:
+During the pre-training prcess, even without any back-translation, you can observe the model can achieve some initial BLEU scores:
 ```
 epoch -> 4
 valid_fr-en_mt_bleu -> 10.55
