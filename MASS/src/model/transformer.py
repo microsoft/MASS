@@ -246,7 +246,7 @@ class TransformerModel(nn.Module):
         self.dico = dico
         self.id2lang = params.id2lang
         self.lang2id = params.lang2id
-        self.english_only = params.english_only
+        self.english_only = getattr(params, 'english_only', False)
         assert len(self.dico) == self.n_words
         assert len(self.id2lang) == len(self.lang2id) == self.n_langs
 
@@ -277,7 +277,7 @@ class TransformerModel(nn.Module):
             self.layer_norm15 = nn.ModuleList()
             self.encoder_attn = nn.ModuleList()
 
-        self.attention_setting = params.attention_setting
+        self.attention_setting = getattr(params, 'attention_setting', 'v1')
 
         for _ in range(self.n_layers):
             self.attentions.append(MultiHeadAttention(self.n_heads, self.dim, dropout=self.attention_dropout))
