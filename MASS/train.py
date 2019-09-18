@@ -166,6 +166,8 @@ def get_parser():
                         help="BT coefficient")
     parser.add_argument("--lambda_mass", type=str, default="1",
                         help="MASS coefficient")
+    parser.add_argument("--lambda_span", type=str, default="10000",
+                        help="Span coefficient")
 
     # training steps
     parser.add_argument("--clm_steps", type=str, default="",

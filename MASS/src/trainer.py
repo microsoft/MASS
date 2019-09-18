@@ -785,31 +785,31 @@ class EncDecTrainer(Trainer):
             shuf_segs = shuf_segs + segs[-1:]
         return shuf_segs
 
-    def get_segments(self, mask_len, min_len):
+    def get_segments(self, mask_len, span_len):
         segs = []
-        while mask_len >= min_len:
-            segs.append(min_len)
-            mask_len -= min_len
+        while mask_len >= span_len:
+            segs.append(span_len)
+            mask_len -= span_len
         if mask_len != 0:
             segs.append(mask_len)
         return segs
 
-    def restricted_mask_sent(self, x, l, min_len=100000):
+    def restricted_mask_sent(self, x, l, span_len=100000):
         """ Restricted mask sents
-            if min_len is equal to 1, it can be viewed as
+            if span_len is equal to 1, it can be viewed as
             discrete mask;
-            if min_len -> inf, it can be viewed as 
+            if span_len -> inf, it can be viewed as 
             pure sentence mask
         """
-        if min_len <= 0:
-            min_len = 1
+        if span_len <= 0:
+            span_len = 1
         max_len = 0
         positions, inputs, targets, outputs, = [], [], [], []
         mask_len = round(len(x[:, 0]) * self.params.word_mass)
         len2 = [mask_len for i in range(l.size(0))]
         
         unmasked_tokens = [0 for i in range(l[0] - mask_len - 1)]
-        segs = self.get_segments(mask_len, min_len)
+        segs = self.get_segments(mask_len, span_len)
         
         for i in range(l.size(0)):
             words = np.array(x[:l[i], i].tolist())
@@ -972,7 +972,7 @@ class EncDecTrainer(Trainer):
         lang2_id = params.lang2id[lang]
         x_, len_ = self.get_batch('mass', lang)
 
-        (x1, len1, x2, len2, y, pred_mask, positions) = self.restricted_mask_sent(x_, len_)
+        (x1, len1, x2, len2, y, pred_mask, positions) = self.restricted_mask_sent(x_, len_, int(params.lambda_span))
 
         langs1 = x1.clone().fill_(lang1_id)
         langs2 = x2.clone().fill_(lang2_id)
