@@ -122,7 +122,7 @@ fairseq-generate $DATADIR --path $MODEL \
 
 
 ## Other questions
-1. Q: I have met error like `ModuleNotFouldError: No module named 'mass'` in multi-GPUs or multi-nodes, how to solve it?
+1. Q: I have met error like `ModuleNotFouldError: No module named 'mass'` in multi-GPUs or multi-nodes, how to solve it?   
    A: It seems like a bug in python `multiprocessing/spawn.py`. A direct solution is to move these three files to its corresponding folder in the fairseq. For example:
 ```
   mv bert_dictionary.py fairseq/fairseq/data/
@@ -137,6 +137,6 @@ fairseq-generate $DATADIR --path $MODEL \
 `MASS-base-uncased` uses 32x NVIDIA 32GB V100 GPUs and trains on (Wikipekia + BookCorpus, 16GB) for 20 epochs (float32), batch size is simulated as 4096.
 
 ## Other questions
-> 1. Q: When i run this program in multi-gpus or multi-nodes, the program reports errors like `ModuleNotFouldError: No module named 'mass'`.   
+> 1. Q: When i run this program in multi-gpus or multi-nodes, the program reports errors like `ModuleNotFouldError: No module named 'mass'`.    
   A: This seems a bug in python `multiprocessing/spawn.py`, a direct solution is to move these files into each relative folder under fairseq. Do not forget to modify the import path in the code.
 -->
