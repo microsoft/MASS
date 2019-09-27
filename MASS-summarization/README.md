@@ -118,7 +118,7 @@ fairseq-generate $DATADIR --path $MODEL \
     --batch-size 64 --beam 5 --min-len 50 --no-repeat-ngram-size 3 \
     --lenpen 1.0 \
 ```
-`min-len` is sensitive for different tasks, `lenpen` needs to be tuned on the dev set.
+`min-len` is sensitive for different tasks, `lenpen` needs to be tuned on the dev set. Restore the results to the word-level data by using `sed 's/ ##//g'`.
 
 <!---
 ## Training Details 
