@@ -23,7 +23,7 @@ MASS uses default Transformer structure. We denote L, H, A as the number of laye
 | ------| -----  | ---- | ---- | ---- |
 | CNN/Daily Mail | 123M | 42.12 | 19.50 | 39.01 |  
 | Gigaword | 123M | 38.73 | 19.71| 35.96 |
-| XSum | 123M | 39.39 | 17.24 | 31.95 |
+| XSum | 123M | 39.75 | 17.24 | 31.95 |
 
 Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge). 
 
