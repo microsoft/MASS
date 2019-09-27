@@ -74,8 +74,6 @@ class MultiprocessingEncoder(object):
 
     def encode(self, line):
         global bpe
-        #ids = bpe.encode(line)
-        #return list(map(str, ids))
         subword = bpe._tokenize(line)
         return subword
 
