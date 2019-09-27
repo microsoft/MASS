@@ -29,6 +29,7 @@ Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge).
 
 ## Pipeline for Pre-Training
 ### Download data
+Our model is trained on Wikipekia + BookCorpus. Here we use wikitext-103 to demonstrate how to process data.
 ```
 wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-raw-v1.zip
 unzip wikitext-103-raw-v1.zip
