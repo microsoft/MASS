@@ -120,6 +120,17 @@ fairseq-generate $DATADIR --path $MODEL \
 ```
 `min-len` is sensitive for different tasks, `lenpen` needs to be tuned on the dev set. Restore the results to the word-level data by using `sed 's/ ##//g'`.
 
+
+## Other questions
+1. Q: I have met error like `ModuleNotFouldError: No module named 'mass'` in multi-GPUs or multi-nodes, how to solve it?
+   A: It seems like a bug in python `multiprocessing/spawn.py`. A direct solution is to move these three files to its corresponding folder in the fairseq. For example:
+```
+  mv bert_dictionary.py fairseq/fairseq/data/
+  mv masked_dataset.py fairseq/fairseq/data/
+  mv learned_positional_embedding.py fairseq/fairseq/modules/
+  modify fairseq/fairseq/data/__init__.py to import the above files.
+```
+
 <!---
 ## Training Details 
 
