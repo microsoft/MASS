@@ -120,7 +120,7 @@ python train.py \
 
 ## Supervised NMT
 
-We also implement MASS on [fairseq](https://github.com/pytorch/fairseq), in order to support the pre-training and fine-tuning for large scale supervised tasks, such as neural machine translation, text summarization. Unsupervised pre-training usually works better in zero-resource or low-resource downstream tasks. However, in large scale supervised NMT, there are plenty of bilingual data, which brings challenges for conventional unsupervised pre-training. Therefore, we design new pre-training loss to support large scale supervised NMT.
+We also implement MASS on [fairseq](https://github.com/pytorch/fairseq), in order to support the pre-training and fine-tuning for large scale supervised tasks, such as neural machine translation, text summarization. Unsupervised pre-training usually works better in zero-resource or low-resource downstream tasks. However, in large scale supervised NMT, there are plenty of bilingual data, which brings challenges for conventional unsupervised pre-training. Therefore, we design new pre-training loss to support large scale supervised NMT. The code is under [MASS-supNMT](MASS-supNMT).
 
 We extend the MASS to supervised setting where the supervised sentence pair (X, Y) is leveraged for pre-training. The sentence X is masked and feed into the encoder, and the decoder predicts the whole sentence Y. Some discret tokens in the decoder input are also masked, to encourage the decoder to extract more informaiton from the encoder side.   
 ![img](MASS-supNMT/archi_mass_sup_md.png)
@@ -320,6 +320,7 @@ Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge).
 
 ### Pipeline for Pre-Training
 #### Download data
+Our model is trained on Wikipekia + BookCorpus. Here we use wikitext-103 to demonstrate how to process data.
 ```
 wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-raw-v1.zip
 unzip wikitext-103-raw-v1.zip
