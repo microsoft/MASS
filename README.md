@@ -291,7 +291,7 @@ fairseq-generate $data_dir \
 
 ## Text Summarization
 
-MASS for text summarization is also implemented on [fairseq](https://github.com/pytorch/fairseq). The code is put under [MASS-summarization](MASS-summarization).
+MASS for text summarization is also implemented on [fairseq](https://github.com/pytorch/fairseq). The code is under [MASS-summarization](MASS-summarization).
 
 
 ### Dependency
