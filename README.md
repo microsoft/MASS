@@ -289,11 +289,7 @@ fairseq-generate $data_dir \
     --beam 5 --remove-bpe 
 ```
 
-
-
-
-
-## Text-Summarization
+## Text Summarization
 
 MASS for text summarization is also implemented on [fairseq](https://github.com/pytorch/fairseq). 
 
