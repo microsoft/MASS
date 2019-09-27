@@ -123,7 +123,7 @@ python train.py \
 We also implement MASS on [fairseq](https://github.com/pytorch/fairseq), in order to support the pre-training and fine-tuning for large scale supervised tasks, such as neural machine translation, text summarization. Unsupervised pre-training usually works better in zero-resource or low-resource downstream tasks. However, in large scale supervised NMT, there are plenty of bilingual data, which brings challenges for conventional unsupervised pre-training. Therefore, we design new pre-training loss to support large scale supervised NMT.
 
 We extend the MASS to supervised setting where the supervised sentence pair (X, Y) is leveraged for pre-training. The sentence X is masked and feed into the encoder, and the decoder predicts the whole sentence Y. Some discret tokens in the decoder input are also masked, to encourage the decoder to extract more informaiton from the encoder side.   
-![img](archi_mass_sup_md.png)
+![img](MASS-supNMT/archi_mass_sup_md.png)
 
 During pre-training, we combine the orignal MASS pre-training loss and the new supervised pre-training loss together. During fine-tuning, we directly use supervised sentence pairs to fine-tune the pre-trained model. Except for NMT, this pre-trainig paradigm can be also applied on other superviseed sequence to sequence tasks.
 
@@ -439,9 +439,5 @@ If you find MASS useful in your work, you can cite the paper as below:
     }
 
     
-
-
-
-
 [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
 
