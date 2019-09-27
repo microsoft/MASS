@@ -15,10 +15,9 @@ from fairseq.models import (
 from fairseq.modules import (
     MultiheadAttention,
     LayerNorm,
-    PositionalEmbedding,
-    LearnedPositionalEmbedding,
 )
 from fairseq.modules.transformer_sentence_encoder import init_bert_params
+from .learned_positional_embedding import LearnedPositionalEmbedding
 
 DEFAULT_MAX_SOURCE_POSITIONS = 512
 DEFAULT_MAX_TARGET_POSITIONS = 512
@@ -382,9 +381,8 @@ class TransformerEncoder(FairseqEncoder):
 
         self.embed_tokens = embed_tokens
         self.embed_scale = math.sqrt(embed_dim)
-        self.embed_positions = PositionalEmbedding(
-            args.max_source_positions, embed_dim, self.padding_idx,
-            learned=True,
+        self.embed_positions = LearnedPositionalEmbedding(
+            args.max_source_positions + 1 + self.padding_idx, embed_dim, self.padding_idx,
         )
 
         self.layers = nn.ModuleList([])
@@ -505,9 +503,8 @@ class TransformerDecoder(FairseqIncrementalDecoder):
         self.embed_tokens = embed_tokens
         self.embed_scale = math.sqrt(embed_dim)  # todo: try with input_embed_dim
         
-        self.embed_positions = PositionalEmbedding(
-            args.max_target_positions, embed_dim, self.padding_idx,
-            learned=True
+        self.embed_positions = LearnedPositionalEmbedding(
+            args.max_target_positions + 1 + self.padding_idx, embed_dim, self.padding_idx,
         )
 
         self.layers = nn.ModuleList([])
