@@ -54,7 +54,7 @@ tar -zxvf mass-base-uncased.tar.gz
 # Move dict.txt from tar file to the data directory 
 
 fairseq-preprocess \
-    --user-dir mass --only-source \
+    --user-dir mass --only-source --task masked_s2s \
     --trainpref mono/train.txt --validpref mono/valid.txt --testpref mono/test.txt \
     --destdir processed --srcdict dict.txt --workers 60
 ```
