@@ -239,7 +239,7 @@ fairseq-train $data_dir \
     --share-decoder-input-output-embed \
     --valid-lang-pairs en-zh \
 ```
-We also provide a pre-training [script](run_mass_enzh.sh) which is used for our released model.
+We also provide a pre-training [script](MASS-supNMT/run_mass_enzh.sh) which is used for our released model.
 
 ### Fine-tuning
 After pre-training stage, we fine-tune the model on bilingual sentence pairs:
@@ -269,10 +269,10 @@ fairseq-train $data_dir \
     --valid-lang-pairs zh-en \
     --reload_checkpoint $model
 ```
-We also provide a fine-tuning [script](ft_mass_enzh.sh) which is used for our pre-trained model.
+We also provide a fine-tuning [script](MASS-supNMT/ft_mass_enzh.sh) which is used for our pre-trained model.
 
 ### Inference
-After the fine-tuning stage, you can generate translation results by using the below [script](translate.sh):
+After the fine-tuning stage, you can generate translation results by using the below [script](MASS-supNMT/translate.sh):
 ```
 model=checkpoints/mass/fine_tune/checkpoint_best.pt
 data_dir=data/processed
@@ -328,7 +328,7 @@ unzip wikitext-103-raw-v1.zip
 ```
 
 #### Tokenize corpus
-We use wordpiece vocabuary (from bert) to tokenize the original text data directly. We provide a [script](encode.py) to deal with data. You need to `pip install pytorch_transformers` first to generate tokenized data. 
+We use wordpiece vocabuary (from bert) to tokenize the original text data directly. We provide a [script](MASS-summarization/encode.py) to deal with data. You need to `pip install pytorch_transformers` first to generate tokenized data. 
 ```
 mkdir -p mono
 for SPLIT in train valid test; do 
