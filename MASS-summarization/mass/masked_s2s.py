@@ -170,4 +170,4 @@ class MaskedS2STask(FairseqTask):
             max_positions = min(max_positions, self.args.max_source_positions)
         if hasattr(self.args, 'max_target_positions'):
             max_positions = min(max_positions, self.args.max_target_positions)
-        return max_positions
+        return (max_positions, max_positions)

@@ -17,4 +17,4 @@ class TranslationMASSTask(TranslationTask):
 
     def max_positions(self):
         """Return the max sentence length allowed by the task."""
-        return min(self.args.max_source_positions, self.args.max_target_positions)
+        return (self.args.max_source_positions, self.args.max_target_positions)

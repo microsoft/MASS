@@ -133,7 +133,7 @@ class TransformerMASSModel(FairseqEncoderDecoderModel):
         return TransformerMASSModel(encoder, decoder)
 
     def max_positions(self):
-        return min(self.encoder.max_positions(), self.decoder.max_positions())
+        return (self.encoder.max_positions(), self.decoder.max_positions())
 
     def forward(self, src_tokens=None, src_lengths=None, prev_output_tokens=None, **kwargs):
         """
