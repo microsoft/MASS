@@ -19,13 +19,13 @@ MASS uses default Transformer structure. We denote L, H, A as the number of laye
 
 ## Results on Abstractive Summarization (9/27/2019)
 
-| Dataset | Params | RG-1 | RG-2 | RG-L |
-| ------| -----  | ---- | ---- | ---- |
-| CNN/Daily Mail | 123M | 42.12 | 19.50 | 39.01 |  
-| Gigaword | 123M | 38.73 | 19.71| 35.96 |
-| XSum | 123M | 39.75 | 17.24 | 31.95 |
+| Dataset | Params | RG-1 | RG-2 | RG-L | FT model |
+| ------| -----  | ---- | ---- | ---- | :----: | 
+| CNN/Daily Mail | 123M | 42.12 | 19.50 | 39.01 |  [MODEL](https://modelrelease.blob.core.windows.net/mass/cnndm_evaluation.tar.gz) |
+| Gigaword | 123M | 38.73 | 19.71| 35.96 | [MODEL](https://modelrelease.blob.core.windows.net/mass/gigaword_evaluation.tar.gz) |
+| XSum | 123M | 39.75 | 17.24 | 31.95 | |
 
-Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge). 
+Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge). `FT model` means `Fine-tuned model`.
 
 ## Pipeline for Pre-Training
 ### Download data
