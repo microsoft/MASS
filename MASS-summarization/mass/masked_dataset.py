@@ -52,7 +52,7 @@ class MaskedLanguagePairDataset(LanguagePairDataset):
         for i in range(1, len(src_item), self.block_size):
             block = positions[i: i + self.block_size]
             masked_len = int(len(block) * self.mask_prob)
-            masked_block_start = np.random.choice(block[:-int(masked_len) + 1], 1)[0]
+            masked_block_start = np.random.choice(block[:len(block) - int(masked_len) + 1], 1)[0]
             masked_pos.extend(positions[masked_block_start : masked_block_start + masked_len])
         masked_pos = np.array(masked_pos)
 
