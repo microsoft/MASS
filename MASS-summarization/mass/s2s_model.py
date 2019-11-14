@@ -663,23 +663,22 @@ def transformer_base(args):
     base_architecture(args)
 
 
-@register_model_architecture('transformer_mass', 'transformer_mass_big')
-def transformer_big(args):
+@register_model_architecture('transformer_mass', 'transformer_mass_middle')
+def transformer_middle(args):
     args.encoder_embed_dim = getattr(args, 'encoder_embed_dim', 1024)
     args.encoder_ffn_embed_dim = getattr(args, 'encoder_ffn_embed_dim', 4096)
     args.encoder_attention_heads = getattr(args, 'encoder_attention_heads', 16)
-    args.encoder_layers = getattr(args, 'encoder_layers', 12)
-
-    args.dropout = getattr(args, 'dropout', 0.1)
-    args.attention_dropout = getattr(args, 'attention_dropout', 0.1)
-    args.activation_dropout = getattr(args, 'activation_dropout', 0.1)
-    args.activation_fn = getattr(args, 'activation_fn', 'gelu')
+    args.encoder_layers = getattr(args, 'encoder_layers', 6)
 
     args.decoder_embed_dim = getattr(args, 'decoder_embed_dim', 1024)
     args.decoder_ffn_embed_dim = getattr(args, 'decoder_ffn_embed_dim', 4096)
     args.decoder_attention_heads = getattr(args, 'decoder_attention_heads', 16)
-    args.decoder_layers = getattr(args, 'decoder_layers', 12)
+    args.decoder_layers = getattr(args, 'decoder_layers', 6)
+    transformer_base(args)
 
-    args.share_decoder_input_output_embed = getattr(args, 'share_decoder_input_output_embed', True)
-    args.share_all_embeddings = getattr(args, 'share_all_embeddings', True)
-    base_architecture(args)
+
+@register_model_architecture('transformer_mass', 'transformer_mass_big')
+def transformer_big(args):
+    args.encoder_layers = getattr(args, 'encoder_layers', 12)
+    args.decoder_layers = getattr(args, 'decoder_layers', 12)
+    transformer_middle(args)

@@ -16,6 +16,7 @@ MASS uses default Transformer structure. We denote L, H, A as the number of laye
 | Model | Encoder | Decoder | Download |
 | :------| :-----|:-----|:-----|
 | MASS-base-uncased | 6L-768H-12A | 6L-768H-12A | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass-base-uncased.tar.gz) | 
+| MASS-middle-uncased | 6L-1024H-16A | 6L-1024H-16A | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass-middle-uncased.tar.gz) |
 
 ## Results on Abstractive Summarization (9/27/2019)
 
