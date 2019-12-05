@@ -307,15 +307,15 @@ MASS uses default Transformer structure. We denote L, H, A as the number of laye
 | Model | Encoder | Decoder | Download |
 | :------| :-----|:-----|:-----|
 | MASS-base-uncased | 6L-768H-12A | 6L-768H-12A | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass-base-uncased.tar.gz) | 
+| MASS-middle-uncased | 6L-1024H-16A | 6L-1024H-16A | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass-middle-uncased.tar.gz) |
 
+### Results on Abstractive Summarization (12/03/2019)
 
-### Results on Abstractive Summarization (9/27/2019)
-
-| Dataset | Params | RG-1 | RG-2 | RG-L |
-| ------| -----  | ---- | ---- | ---- |
-| CNN/Daily Mail | 123M | 42.12 | 19.50 | 39.01 |  
-| Gigaword | 123M | 38.73 | 19.71| 35.96 |
-| XSum | 123M | 39.75 | 17.24 | 31.95 |
+| Dataset | RG-1 | RG-2 | RG-L |
+| ------| ---- | ---- | ---- |
+| CNN/Daily Mail | 43.05 | 20.02 | 40.08 |  
+| Gigaword | 38.93 | 20.20 | 36.20 |
+| XSum | 39.75 | 17.24 | 31.95 |
 
 Evaluated by [files2rouge](https://github.com/pltrdy/files2rouge). 
 
