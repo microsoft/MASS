@@ -85,7 +85,7 @@ fairseq-train processed \
 ## Pipeline for Fine-tuning (CNN / Daily Mail)
 
 ### Data 
-Download, tokenize and truncate data from this [link](https://github.com/abisee/cnn-dailymail), and use the above [tokenization](#tokenize-corpus) to generate wordpiece-level data. Rename the shuffix `article` and `title` as `src` and `tgt`. Assume the tokenized data is under `cnndm/para`
+Download, tokenize and truncate data from this [link](https://github.com/abisee/cnn-dailymail), and use the above [tokenization](#tokenize-corpus) to generate wordpiece-level data. Rename the suffix `article` and `title` as `src` and `tgt`. Assume the tokenized data is under `cnndm/para`
 ```
 fairseq-preprocess \
     --user-dir mass --task masked_s2s \
