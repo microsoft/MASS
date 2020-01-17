@@ -120,9 +120,11 @@ python train.py \
 
 We also provide a demo to use MASS pre-trained model on the WMT16 en-ro bilingual dataset. We provide pre-trained and fine-tuned models:
 
-| Languages | Fine-tuned Model  | BPE codes | Vocabulary | BLEU |
-|:---------:|:-----------------:| ---------:| ----------:|:----:|
-| Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth) | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_enro) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enro) | WMT16 Ro-En: 39.1 |
+| Model | Ro-En BLEU (with BT) |
+|:---------:|:----:|
+| Baseline | 34.0 |
+| XLM | 38.5 |
+| [MASS](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth) | 39.1 |
 
 
 Download dataset by the below command:
