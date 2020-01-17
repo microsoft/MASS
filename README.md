@@ -118,6 +118,47 @@ python train.py \
   --reload_model "$MODEL,$MODEL"                       \
 ```
 
+We also provide a demo to use MASS pre-trained model on the WMT16 en-ro bilingual dataset. We provide pre-trained and fine-tuned models:
+
+| Languages | Fine-tuned Model  | BPE codes | Vocabulary | BLEU |
+|:---------:|:-----------------:| ---------:| ----------:|:----:|
+| Ro-En | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_mt_enro_1024.pth) | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_enro) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enro) | WMT16 Ro-En: 39.1 |
+
+
+Download dataset by the below command:
+```
+wget https://dl.fbaipublicfiles.com/XLM/codes_enro
+wget https://dl.fbaipublicfiles.com/XLM/vocab_enro
+
+./get-data-bilingual-enro-nmt.sh --src en --tgt ro --reload_codes codes_enro --reload_vocab vocab_enro
+```
+
+After download the mass pre-trained model from the above link. And use the following command to fine tune:
+```
+MODEL=mass_enro_1024.pth
+
+python train.py \
+	--exp_name unsupMT_enro                              \
+	--data_path ./data/processed/en-ro                   \
+	--lgs 'en-ro'                                        \
+	--bt_steps 'en-ro-en,ro-en-ro'                       \
+	--encoder_only false                                 \
+	--mt_steps 'en-ro,ro-en'                             \
+	--emb_dim 1024                                       \
+	--n_layers 6                                         \
+	--n_heads 8                                          \
+	--dropout 0.1                                        \
+	--attention_dropout 0.1                              \
+	--gelu_activation true                               \
+	--tokens_per_batch 2000                              \
+	--batch_size 32                                      \
+	--bptt 256                                           \
+	--optimizer adam_inverse_sqrt,beta1=0.9,beta2=0.98,lr=0.0001 \
+	--epoch_size 200000                                  \
+	--max_epoch 50                                       \
+	--eval_bleu true                                     \
+	--reload_model "$MODEL,$MODEL"
+```
 
 ## Supervised NMT
 
