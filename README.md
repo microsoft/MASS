@@ -23,6 +23,9 @@ MASS can be applied on cross-lingual tasks such as neural machine translation (N
 * [Text Summarization](#text-summarization)
 
 
+### What is New!
+We release [MPNet](https://arxiv.org/pdf/2004.09297.pdf), a new pre-trained method for language understanding. GitHub: https://github.com/microsoft/MPNet
+
 
 ## Unsupervised NMT
 
