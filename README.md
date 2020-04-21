@@ -480,5 +480,7 @@ If you find MASS useful in your work, you can cite the paper as below:
         year={2019}
     }
     
-[Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct)
+## Related Works
+
+* [MPNet: Masked and Permuted Pre-training for Language Understanding](https://arxiv.org/pdf/2004.09297.pdf), by Kaitao Song, Xu Tan, Tao Qin, Jianfeng Lu, Tie-Yan Liu. GitHub: https://github.com/microsoft/MPNet
 
