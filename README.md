@@ -93,6 +93,15 @@ valid_en-fr_mt_bleu ->  7.81
 test_fr-en_mt_bleu  -> 11.72
 test_en-fr_mt_bleu  ->  8.80
 ```
+#### Distributed Training
+
+To use *multiple GPUs* e.g. 3 GPUs **on same node**
+```
+export NGPU=3; CUDA_VISIBLE_DEVICES=0,1,2 python -m torch.distributed.launch --nproc_per_node=$NGPU train.py [...args]
+```
+To use *multiple GPUS* across **many nodes**, use Slurm to request multi-node job and launch the above command. 
+The code automatically detects the SLURM_* environment vars to distribute the training.
+
 
 ### Fine-tuning 
 After pre-training, we use back-translation to fine-tune the pre-trained model on unsupervised machine translation:
