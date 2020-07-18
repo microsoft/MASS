@@ -168,7 +168,7 @@ class MaskedLanguagePairDataset(FairseqDataset):
         elif p >= 0.6:
             return end
         else:
-            return np.random.randint(1, end)
+            return np.random.randint(1, max(2, end))
 
     def mask_word(self, w):
         p = np.random.random()
