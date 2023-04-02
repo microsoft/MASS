@@ -29,7 +29,7 @@ We release [MPNet](https://arxiv.org/pdf/2004.09297.pdf), a new pre-trained meth
 
 ## Unsupervised NMT
 
-Unsupervised Neural Machine Translation just uses monolingual data to train the models. During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding langauge embeddings to differentiate the langauges. During MASS fine-tuning, back-translation is used to train the unsupervised models. Code is under [MASS-unsupNMT](MASS-unsupNMT). We provide pre-trained and fine-tuned models:
+Unsupervised Neural Machine Translation just uses monolingual data to train the models. During MASS pre-training, the source and target languages are pre-trained in one model, with the corresponding language embeddings to differentiate the languages. During MASS fine-tuning, back-translation is used to train the unsupervised models. Code is under MASS-unsupNMT. We provide pre-trained and fine-tuned models:
 
 | Languages | Pre-trained Model | Fine-tuned Model | BPE codes | Vocabulary |
 |-----------|:-----------------:|:----------------:| ---------:| ----------:|
@@ -37,10 +37,11 @@ Unsupervised Neural Machine Translation just uses monolingual data to train the 
 | EN - DE   | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_ende_1024.pth) | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_ft_ende_1024.pth) | [BPE codes](https://dl.fbaipublicfiles.com/XLM/codes_ende) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_ende) |
 | En - RO   | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_enro_1024.pth) | [MODEL](https://modelrelease.blob.core.windows.net/mass/mass_ft_enro_1024.pth) | [BPE_codes](https://dl.fbaipublicfiles.com/XLM/codes_enro) | [Vocabulary](https://dl.fbaipublicfiles.com/XLM/vocab_enro) |
 
-We are also preparing larger models on more language pairs, and will release them in the future.
+We are also preparing larger models on more language pairs and will release them in the future.
+
 
 ### Dependencies
-Currently we implement MASS for unsupervised NMT based on the codebase of [XLM](https://github.com/facebookresearch/XLM). The depencies are as follows:
+Currently we implement MASS for unsupervised NMT based on the codebase of [XLM](https://github.com/facebookresearch/XLM). The dependencies are as follows depencies are as follows:
 - Python 3
 - NumPy
 - PyTorch (version 0.4 and 1.0)
@@ -181,7 +182,7 @@ We also implement MASS on [fairseq](https://github.com/pytorch/fairseq), in orde
 We extend the MASS to supervised setting where the supervised sentence pair (X, Y) is leveraged for pre-training. The sentence X is masked and feed into the encoder, and the decoder predicts the whole sentence Y. Some discret tokens in the decoder input are also masked, to encourage the decoder to extract more informaiton from the encoder side.   
 ![img](MASS-supNMT/archi_mass_sup_md.png)
 
-During pre-training, we combine the orignal MASS pre-training loss and the new supervised pre-training loss together. During fine-tuning, we directly use supervised sentence pairs to fine-tune the pre-trained model. Except for NMT, this pre-trainig paradigm can be also applied on other superviseed sequence to sequence tasks.
+During pre-training, we combine the orignal MASS pre-training loss and the new supervised pre-training loss together. During fine-tuning, we directly use supervised sentence pairs to fine-tune the pre-trained model. Except for NMT, this pre-training paradigm can be also applied on other  supervised sequence to sequence tasks.
 
 We release the pre-trained model and example codes of how to pre-train and fine-tune on WMT Chinese<->English (Zh<->En) translation.:
 
@@ -383,7 +384,7 @@ unzip wikitext-103-raw-v1.zip
 ```
 
 #### Tokenize corpus
-We use wordpiece vocabuary (from bert) to tokenize the original text data directly. We provide a [script](MASS-summarization/encode.py) to deal with data. You need to `pip install pytorch_transformers` first to generate tokenized data. 
+We use wordpiece vocabulary (from bert) to tokenize the original text data directly. We provide a [script](MASS-summarization/encode.py) to deal with data. You need to `pip install pytorch_transformers` first to generate tokenized data. 
 ```
 mkdir -p mono
 for SPLIT in train valid test; do 
