@@ -126,13 +126,26 @@ fairseq-generate $DATADIR --path $MODEL \
 
 ## Other questions
 1. Q: I have met error like `ModuleNotFouldError: No module named 'mass'` in multi-GPUs or multi-nodes, how to solve it?   
-   A: It seems like a bug in python `multiprocessing/spawn.py`. A direct solution is to move these three files to its corresponding folder in the fairseq. For example:
+   A: It seems like a bug in python `multiprocessing/spawn.py`. A direct solution is to move these three files to its    corresponding folder in the fairseq. For example:
 ```
+  # Make sure you clone the release corresponding to MASS required version.
+  git clone  https://github.com/pytorch/fairseq.git --branch v0.8.0. 
   mv bert_dictionary.py fairseq/fairseq/data/
   mv masked_dataset.py fairseq/fairseq/data/
   mv learned_positional_embedding.py fairseq/fairseq/modules/
+  
+  # Make sure those new imports are inserted after the existing ones in __init__.py
   modify fairseq/fairseq/data/__init__.py to import the above files.
 ```
+ 
+   Remember to modify imports in `s2s_model.py, masked_s2s.py, s2s_model.py` to import from `fairseq.data`.
+   For example in `translation.py`:
+```
+    - from .bert_dictionary import BertDictionary
+    + from fairseq.data.bert_dictionary import BertDictionary
+```
+
+   In order to apply those changes to `fairseq` source you will need to clone. Make sure you clone the tag corresponding to    the version required by `MASS`, i.e: `git clone  https://github.com/pytorch/fairseq.git --branch v0.8.0`. 
 
 <!---
 ## Training Details 
